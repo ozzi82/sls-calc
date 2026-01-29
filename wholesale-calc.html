@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Price Calc">
+  <meta name="theme-color" content="#111827">
+  <title>Wholesale Pricing Calculator</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="data:application/json,{
+    &quot;name&quot;: &quot;Wholesale Pricing Calculator&quot;,
+    &quot;short_name&quot;: &quot;Price Calc&quot;,
+    &quot;start_url&quot;: &quot;.&quot;,
+    &quot;display&quot;: &quot;standalone&quot;,
+    &quot;background_color&quot;: &quot;%23111827&quot;,
+    &quot;theme_color&quot;: &quot;%23111827&quot;
+  }">
+  
+  <!-- iOS Icons (you can replace with your own) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23f97316' width='100' height='100' rx='20'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='white'>$</text></svg>">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #111827;
+      color: #f3f4f6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    body {
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+    
+    .container {
+      padding: 16px;
+      padding-bottom: 100px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #f97316;
+      margin-bottom: 4px;
+    }
+    
+    .subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 16px;
+    }
+    
+    .card {
+      background: #1f2937;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e5e7eb;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-title small {
+      font-weight: 400;
+      color: #6b7280;
+      font-size: 11px;
+    }
+    
+    label {
+      display: block;
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+    
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      background: #374151;
+      border: 1px solid #4b5563;
+      border-radius: 10px;
+      padding: 14px 12px;
+      font-size: 16px;
+      color: #f3f4f6;
+      -webkit-appearance: none;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #f97316;
+    }
+    
+    input::placeholder {
+      color: #6b7280;
+    }
+    
+    .input-with-prefix {
+      position: relative;
+    }
+    
+    .input-with-prefix .prefix {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-size: 16px;
+    }
+    
+    .input-with-prefix input {
+      padding-left: 28px;
+    }
+    
+    .input-with-suffix {
+      position: relative;
+    }
+    
+    .input-with-suffix .suffix {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-size: 16px;
+    }
+    
+    .input-with-suffix input {
+      padding-right: 32px;
+    }
+    
+    /* Line Items */
+    .line-item {
+      display: grid;
+      grid-template-columns: 1fr 70px 70px 30px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 10px;
+      background: #374151;
+      border-radius: 10px;
+    }
+    
+    .line-item input {
+      padding: 10px 8px;
+      font-size: 14px;
+      background: #4b5563;
+      border: none;
+    }
+    
+    .line-item .cost-input {
+      padding-left: 20px;
+    }
+    
+    .line-item .prefix {
+      left: 8px;
+      font-size: 14px;
+    }
+    
+    .line-item-num {
+      font-size: 12px;
+      color: #6b7280;
+      position: absolute;
+      top: -18px;
+      left: 0;
+    }
+    
+    .remove-btn {
+      background: none;
+      border: none;
+      color: #6b7280;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    
+    .remove-btn:hover {
+      color: #ef4444;
+    }
+    
+    .add-btn {
+      width: 100%;
+      padding: 12px;
+      background: #374151;
+      border: 2px dashed #4b5563;
+      border-radius: 10px;
+      color: #9ca3af;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    
+    .add-btn:active {
+      background: #4b5563;
+    }
+    
+    /* Settings Grid */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    
+    .settings-grid.three-col {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    
+    /* Toggle Buttons */
+    .toggle-group {
+      display: flex;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    
+    .toggle-btn {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #4b5563;
+      background: #374151;
+      color: #9ca3af;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .toggle-btn:first-child {
+      border-radius: 10px 0 0 10px;
+    }
+    
+    .toggle-btn:last-child {
+      border-radius: 0 10px 10px 0;
+      border-left: none;
+    }
+    
+    .toggle-btn.active {
+      background: #f97316;
+      border-color: #f97316;
+      color: white;
+    }
+    
+    /* Totals Row */
+    .totals-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-top: 12px;
+      border-top: 1px solid #374151;
+      margin-top: 12px;
+    }
+    
+    .total-item {
+      text-align: center;
+    }
+    
+    .total-label {
+      font-size: 10px;
+      color: #6b7280;
+      margin-bottom: 2px;
+    }
+    
+    .total-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    
+    .total-value.primary { color: #f97316; }
+    .total-value.white { color: #ffffff; }
+    .total-value.red { color: #f87171; }
+    
+    /* Multiplier Control */
+    .multiplier-control {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .mult-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #374151;
+      border: none;
+      color: #e5e7eb;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .mult-btn:active {
+      background: #4b5563;
+    }
+    
+    .mult-input {
+      width: 60px !important;
+      text-align: center;
+      font-weight: 700;
+      color: #f97316 !important;
+    }
+    
+    .mult-suggested {
+      font-size: 10px;
+      color: #6b7280;
+      text-align: center;
+      margin-top: 2px;
+    }
+    
+    .mult-suggested button {
+      background: none;
+      border: none;
+      color: #f97316;
+      font-size: 10px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    
+    /* Commission Table */
+    .commission-table {
+      width: 100%;
+      font-size: 13px;
+    }
+    
+    .commission-table th {
+      text-align: right;
+      padding: 8px 6px;
+      color: #6b7280;
+      font-weight: 500;
+      font-size: 11px;
+    }
+    
+    .commission-table th:first-child {
+      text-align: left;
+    }
+    
+    .commission-table td {
+      padding: 14px 6px;
+      text-align: right;
+      border-top: 1px solid #374151;
+    }
+    
+    .commission-table td:first-child {
+      text-align: left;
+      font-weight: 600;
+    }
+    
+    .commission-table tr {
+      cursor: pointer;
+    }
+    
+    .commission-table tr:active {
+      background: #374151;
+    }
+    
+    .commission-table tr.selected {
+      background: rgba(249, 115, 22, 0.15);
+    }
+    
+    .commission-table tr.selected td:first-child {
+      color: #f97316;
+    }
+    
+    .comm-value { color: #facc15; }
+    .subtotal-value { color: #fb923c; }
+    .profit-value { color: #4ade80; font-weight: 600; }
+    .total-value-cell { color: #e5e7eb; }
+    
+    /* Quote Summary */
+    .quote-summary {
+      background: linear-gradient(135deg, rgba(124, 45, 18, 0.4), #1f2937);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+    
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    
+    .summary-item {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+    
+    .summary-item.profit {
+      background: rgba(34, 197, 94, 0.15);
+    }
+    
+    .summary-label {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+    
+    .summary-value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    
+    .summary-value.orange { color: #f97316; }
+    .summary-value.yellow { color: #facc15; }
+    .summary-value.green { color: #4ade80; }
+    .summary-value.blue { color: #60a5fa; }
+    .summary-value.gray { color: #9ca3af; }
+    .summary-value.red { color: #f87171; }
+    
+    .summary-sub {
+      font-size: 10px;
+      color: #6b7280;
+    }
+    
+    .customer-total {
+      margin-top: 12px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .customer-total-label {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    
+    .customer-total-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    
+    /* Per Item Table */
+    .item-table {
+      width: 100%;
+      font-size: 12px;
+    }
+    
+    .item-table th {
+      text-align: right;
+      padding: 8px 4px;
+      color: #6b7280;
+      font-weight: 500;
+      font-size: 10px;
+    }
+    
+    .item-table th:first-child {
+      text-align: left;
+    }
+    
+    .item-table td {
+      padding: 10px 4px;
+      text-align: right;
+      border-top: 1px solid #374151;
+    }
+    
+    .item-table td:first-child {
+      text-align: left;
+      color: #d1d5db;
+    }
+    
+    .item-table .unit-price { color: #60a5fa; }
+    .item-table .unit-comm { color: #facc15; }
+    .item-table .unit-total { color: #fb923c; }
+    .item-table .line-total { color: #ffffff; font-weight: 600; }
+    
+    .item-table tfoot td {
+      padding-top: 12px;
+      border-top: 2px solid #4b5563;
+    }
+    
+    .item-table tfoot tr:not(:first-child) td {
+      padding-top: 6px;
+      border-top: none;
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6b7280;
+    }
+    
+    /* Info Badge */
+    .info-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(96, 165, 250, 0.15);
+      color: #60a5fa;
+      border-radius: 20px;
+      font-size: 11px;
+    }
+    
+    .info-badge.purple {
+      background: rgba(167, 139, 250, 0.15);
+      color: #a78bfa;
+    }
+    
+    .info-badge.yellow {
+      background: rgba(250, 204, 21, 0.15);
+      color: #facc15;
+    }
+    
+    /* Helper text */
+    .helper-text {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 8px;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+    
+    /* Hide number input spinners */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <!-- Header -->
+    <h1>Wholesale Pricing</h1>
+    <p class="subtitle">(Cost + Tariff) × Multiplier ÷ (1 - Comm%) + Shipping</p>
+    
+    <!-- Line Items -->
+    <div class="card">
+      <div class="card-title">
+        Line Items
+        <button class="add-btn" onclick="addLineItem()" style="width: auto; padding: 6px 12px; margin: 0; border: none; background: #f97316; color: white; border-radius: 8px;">+ Add</button>
+      </div>
+      <div id="lineItems"></div>
+    </div>
+    
+    <!-- Settings -->
+    <div class="card">
+      <div class="settings-grid three-col">
+        <div>
+          <label>Tariff %</label>
+          <div class="input-with-suffix">
+            <input type="number" id="tariffPercent" value="10" inputmode="decimal" onchange="calculate()">
+            <span class="suffix">%</span>
+          </div>
+        </div>
+        <div>
+          <label>Shipping</label>
+          <div class="input-with-prefix">
+            <span class="prefix">$</span>
+            <input type="number" id="shippingCost" placeholder="0" inputmode="decimal" onchange="calculate()">
+          </div>
+        </div>
+        <div>
+          <label>Salesperson?</label>
+          <div class="toggle-group">
+            <button class="toggle-btn active" id="salesYes" onclick="setSalesperson(true)">Yes</button>
+            <button class="toggle-btn" id="salesNo" onclick="setSalesperson(false)">No</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Results -->
+    <div id="results"></div>
+  </div>
+
+  <script>
+    // State
+    let lineItems = [
+      { id: 1, description: '', unitCost: '', quantity: '1' },
+      { id: 2, description: '', unitCost: '', quantity: '1' },
+      { id: 3, description: '', unitCost: '', quantity: '1' }
+    ];
+    let hasSalesperson = true;
+    let selectedCommission = 20;
+    let customMultiplier = null;
+    let nextId = 4;
+    
+    // Multiplier function based on research
+    function getMultiplier(cost) {
+      if (cost <= 0) return 3.5;
+      if (cost < 100) return 4.0;
+      if (cost < 250) return 3.8;
+      if (cost < 500) return 3.5;
+      if (cost < 750) return 3.2;
+      if (cost < 1000) return 3.0;
+      if (cost < 1500) return 2.8;
+      if (cost < 2500) return 2.6;
+      if (cost < 4000) return 2.4;
+      if (cost < 6000) return 2.2;
+      if (cost < 10000) return 2.0;
+      if (cost < 15000) return 1.85;
+      if (cost < 25000) return 1.7;
+      if (cost < 50000) return 1.6;
+      return 1.5;
+    }
+    
+    function formatCurrency(num) {
+      return new Intl.NumberFormat('en-US', { 
+        style: 'currency', 
+        currency: 'USD',
+        minimumFractionDigits: 2
+      }).format(num);
+    }
+    
+    function addLineItem() {
+      lineItems.push({ id: nextId++, description: '', unitCost: '', quantity: '1' });
+      renderLineItems();
+    }
+    
+    function removeLineItem(id) {
+      if (lineItems.length > 1) {
+        lineItems = lineItems.filter(item => item.id !== id);
+        renderLineItems();
+        calculate();
+      }
+    }
+    
+    function updateLineItem(id, field, value) {
+      const item = lineItems.find(i => i.id === id);
+      if (item) {
+        item[field] = value;
+        calculate();
+      }
+    }
+    
+    function setSalesperson(value) {
+      hasSalesperson = value;
+      document.getElementById('salesYes').classList.toggle('active', value);
+      document.getElementById('salesNo').classList.toggle('active', !value);
+      calculate();
+    }
+    
+    function selectCommission(rate) {
+      selectedCommission = rate;
+      calculate();
+    }
+    
+    function adjustMultiplier(delta) {
+      const current = customMultiplier !== null ? customMultiplier : getMultiplier(getTotalCost());
+      customMultiplier = Math.round(Math.max(1.1, Math.min(10, current + delta)) * 10) / 10;
+      calculate();
+    }
+    
+    function setMultiplier(value) {
+      const val = parseFloat(value);
+      if (!isNaN(val) && val >= 1.1 && val <= 10) {
+        customMultiplier = Math.round(val * 10) / 10;
+        calculate();
+      }
+    }
+    
+    function resetMultiplier() {
+      customMultiplier = null;
+      calculate();
+    }
+    
+    function getTotalCost() {
+      const tariff = parseFloat(document.getElementById('tariffPercent').value) || 0;
+      const totalRawCost = lineItems.reduce((sum, item) => {
+        const cost = parseFloat(item.unitCost) || 0;
+        const qty = parseInt(item.quantity) || 0;
+        return sum + (cost * qty);
+      }, 0);
+      return totalRawCost * (1 + tariff / 100);
+    }
+    
+    function renderLineItems() {
+      const container = document.getElementById('lineItems');
+      container.innerHTML = lineItems.map((item, index) => `
+        <div class="line-item">
+          <input type="text" placeholder="Item ${index + 1}" value="${item.description}" 
+                 onchange="updateLineItem(${item.id}, 'description', this.value)">
+          <div class="input-with-prefix">
+            <span class="prefix">$</span>
+            <input type="number" class="cost-input" placeholder="0" value="${item.unitCost}" 
+                   inputmode="decimal" onchange="updateLineItem(${item.id}, 'unitCost', this.value)">
+          </div>
+          <input type="number" placeholder="1" value="${item.quantity}" style="text-align: center;"
+                 inputmode="numeric" onchange="updateLineItem(${item.id}, 'quantity', this.value)">
+          <button class="remove-btn" onclick="removeLineItem(${item.id})" ${lineItems.length <= 1 ? 'style="visibility:hidden"' : ''}>×</button>
+        </div>
+      `).join('');
+    }
+    
+    function calculate() {
+      const tariff = parseFloat(document.getElementById('tariffPercent').value) || 0;
+      const shipping = parseFloat(document.getElementById('shippingCost').value) || 0;
+      
+      // Calculate totals
+      const activeItems = lineItems.filter(item => {
+        const cost = parseFloat(item.unitCost) || 0;
+        const qty = parseInt(item.quantity) || 0;
+        return cost > 0 && qty > 0;
+      }).map(item => ({
+        ...item,
+        unitCostNum: parseFloat(item.unitCost),
+        qtyNum: parseInt(item.quantity),
+        lineCost: parseFloat(item.unitCost) * parseInt(item.quantity)
+      }));
+      
+      if (activeItems.length === 0) {
+        document.getElementById('results').innerHTML = `
+          <div class="card empty-state">
+            Enter line items above to see pricing
+          </div>
+        `;
+        return;
+      }
+      
+      const totalRawCost = activeItems.reduce((sum, item) => sum + item.lineCost, 0);
+      const tariffAmount = totalRawCost * (tariff / 100);
+      const totalCost = totalRawCost + tariffAmount;
+      const totalQuantity = activeItems.reduce((sum, item) => sum + item.qtyNum, 0);
+      
+      const suggestedMultiplier = getMultiplier(totalCost);
+      const multiplier = customMultiplier !== null ? customMultiplier : suggestedMultiplier;
+      const basePrice = totalCost * multiplier;
+      
+      // Commission scenarios
+      const commissionRates = [10, 15, 20, 22, 25, 30];
+      const scenarios = commissionRates.map(rate => {
+        let subtotal, commission;
+        if (hasSalesperson && rate > 0) {
+          subtotal = basePrice / (1 - rate / 100);
+          commission = subtotal - basePrice;
+        } else {
+          subtotal = basePrice;
+          commission = 0;
+        }
+        const customerTotal = subtotal + shipping;
+        const profit = subtotal - totalCost - commission;
+        
+        return { rate, basePrice, commission, subtotal, profit, customerTotal };
+      });
+      
+      const selected = scenarios.find(s => s.rate === selectedCommission) || scenarios[2];
+      
+      // Per-item pricing
+      const itemPricing = activeItems.map(item => {
+        const ratio = item.lineCost / totalCost;
+        const itemBase = basePrice * ratio;
+        const unitBase = itemBase / item.qtyNum;
+        
+        let itemSubtotal, itemCommission;
+        if (hasSalesperson && selectedCommission > 0) {
+          itemSubtotal = itemBase / (1 - selectedCommission / 100);
+          itemCommission = itemSubtotal - itemBase;
+        } else {
+          itemSubtotal = itemBase;
+          itemCommission = 0;
+        }
+        const unitSubtotal = itemSubtotal / item.qtyNum;
+        const unitCommission = itemCommission / item.qtyNum;
+        
+        return { ...item, unitBase, unitCommission, unitSubtotal, itemSubtotal };
+      });
+      
+      // Render results
+      document.getElementById('results').innerHTML = `
+        <!-- Totals Summary -->
+        <div class="card">
+          <div class="totals-row" style="border: none; padding-top: 0; margin-top: 0;">
+            <div>
+              <div class="total-label">Raw Cost</div>
+              <div class="total-value" style="font-size: 14px; color: #9ca3af;">${formatCurrency(totalRawCost)}</div>
+            </div>
+            ${tariffAmount > 0 ? `
+            <div>
+              <div class="total-label">+ ${tariff}% Tariff</div>
+              <div class="total-value red" style="font-size: 14px;">${formatCurrency(tariffAmount)}</div>
+            </div>
+            ` : ''}
+            <div>
+              <div class="total-label">True Cost</div>
+              <div class="total-value white" style="font-size: 16px;">${formatCurrency(totalCost)}</div>
+            </div>
+            <div>
+              <div class="total-label">Multiplier</div>
+              <div class="multiplier-control">
+                <button class="mult-btn" onclick="adjustMultiplier(-0.1)">−</button>
+                <input type="number" class="mult-input" value="${multiplier.toFixed(1)}" 
+                       onchange="setMultiplier(this.value)" step="0.1" min="1.1" max="10">
+                <button class="mult-btn" onclick="adjustMultiplier(0.1)">+</button>
+              </div>
+              <div class="mult-suggested">
+                Suggested: ${suggestedMultiplier}x
+                ${customMultiplier !== null && customMultiplier !== suggestedMultiplier ? 
+                  `<button onclick="resetMultiplier()">reset</button>` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Commission Table -->
+        <div class="card">
+          <div class="card-title">
+            Select Commission Rate
+            <span class="info-badge${customMultiplier !== null && customMultiplier !== suggestedMultiplier ? ' purple' : ''}">${((multiplier - 1) * 100).toFixed(0)}% markup${customMultiplier !== null && customMultiplier !== suggestedMultiplier ? ' (custom)' : ''}</span>
+          </div>
+          <table class="commission-table">
+            <thead>
+              <tr>
+                <th>Comm.</th>
+                <th>Base</th>
+                <th>+ Comm.</th>
+                <th>Subtotal</th>
+                <th>Profit</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${scenarios.map(s => `
+                <tr class="${s.rate === selectedCommission ? 'selected' : ''}" onclick="selectCommission(${s.rate})">
+                  <td>${s.rate}%</td>
+                  <td>${formatCurrency(s.basePrice)}</td>
+                  <td class="comm-value">${hasSalesperson ? formatCurrency(s.commission) : '—'}</td>
+                  <td class="subtotal-value">${formatCurrency(s.subtotal)}</td>
+                  <td class="profit-value">${formatCurrency(s.profit)}</td>
+                  <td class="total-value-cell">${formatCurrency(s.customerTotal)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="helper-text">
+            Tap a row to select. Commission = Subtotal × Rate.
+          </div>
+        </div>
+        
+        <!-- Quote Summary -->
+        <div class="card quote-summary">
+          <div class="card-title" style="color: #fdba74;">
+            Quote Summary
+            <span class="info-badge yellow">${selectedCommission}% commission</span>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-label">True Cost</div>
+              <div class="summary-value">${formatCurrency(totalCost)}</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">× ${multiplier.toFixed(1)}</div>
+              <div class="summary-value blue">${formatCurrency(selected.basePrice)}</div>
+              <div class="summary-sub">Base Price</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">+ ${selectedCommission}% Comm.</div>
+              <div class="summary-value yellow">${hasSalesperson ? formatCurrency(selected.commission) : '$0'}</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">= Subtotal</div>
+              <div class="summary-value orange">${formatCurrency(selected.subtotal)}</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">+ Shipping</div>
+              <div class="summary-value gray">${formatCurrency(shipping)}</div>
+            </div>
+            <div class="summary-item profit">
+              <div class="summary-label">Your Profit</div>
+              <div class="summary-value green">${formatCurrency(selected.profit)}</div>
+            </div>
+          </div>
+          <div class="customer-total">
+            <div class="customer-total-label">Customer Pays</div>
+            <div class="customer-total-value">${formatCurrency(selected.customerTotal)}</div>
+          </div>
+        </div>
+        
+        <!-- Per-Item Pricing -->
+        <div class="card">
+          <div class="card-title">
+            Pricing Per Item
+            ${hasSalesperson ? `<small>incl. ${selectedCommission}% comm.</small>` : ''}
+          </div>
+          <table class="item-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Cost</th>
+                <th>Price</th>
+                ${hasSalesperson ? '<th>Comm.</th>' : ''}
+                <th>Total</th>
+                <th>Line</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemPricing.map((item, i) => `
+                <tr>
+                  <td>${item.description || `Item ${i + 1}`}</td>
+                  <td style="text-align: center; color: #9ca3af;">${item.qtyNum}</td>
+                  <td style="color: #9ca3af;">${formatCurrency(item.unitCostNum)}</td>
+                  <td class="unit-price">${formatCurrency(item.unitBase)}</td>
+                  ${hasSalesperson ? `<td class="unit-comm">${formatCurrency(item.unitCommission)}</td>` : ''}
+                  <td class="unit-total">${formatCurrency(item.unitSubtotal)}</td>
+                  <td class="line-total">${formatCurrency(item.itemSubtotal)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="${hasSalesperson ? 6 : 5}" style="text-align: right; color: #9ca3af;">Subtotal${hasSalesperson ? ` (incl. ${selectedCommission}% comm.)` : ''}:</td>
+                <td class="line-total" style="color: #fb923c;">${formatCurrency(selected.subtotal)}</td>
+              </tr>
+              <tr>
+                <td colspan="${hasSalesperson ? 6 : 5}" style="text-align: right; color: #6b7280;">+ Shipping:</td>
+                <td style="color: #9ca3af;">${formatCurrency(shipping)}</td>
+              </tr>
+              <tr>
+                <td colspan="${hasSalesperson ? 6 : 5}" style="text-align: right; color: #e5e7eb; font-weight: 600;">Customer Total:</td>
+                <td style="color: #ffffff; font-weight: 700; font-size: 14px;">${formatCurrency(selected.customerTotal)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      `;
+    }
+    
+    // Initialize
+    renderLineItems();
+    calculate();
+  </script>
+</body>
+</html>
