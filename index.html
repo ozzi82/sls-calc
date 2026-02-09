@@ -1,3 +1,2003 @@
+
+i need  your help to create a calculator for my business. i purchase goods from china and sometimes i have a salesperson in between where i give between 10 and 30% based on the final amount. the commission is calculated on the sale without shipping costs being included. i need something where i simply put in the purchase price and the shipping costs and the tool tells me or gives me suggestion how to sell, how much comision to give. small numbers can have higher margin for me and big numbers should be smaller. and i want to have at least double more then the paid out commission as my margin is calculated on the incoming price and the comision is based on the final number including my margin
+
+Jan 28
+
+Architected wholesale pricing calculator with tiered margins and commission constraints
+
+
+
+
+
+
+
+
+
+
+I'll create a pricing calculator for your wholesale business. Let me build this as an interactive tool.
+
+
+Architected pricing calculator framework with commission logic
+
+
+I built you a calculator that handles all your requirements. Here's what it does:
+
+Input fields:
+
+Purchase price (your cost from China)
+Shipping cost
+Toggle for whether a salesperson is involved
+The pricing logic:
+
+Small orders (under $200): 150% markup, suggests 15% commission
+Medium orders ($500-$1000): 100% markup, suggests 20% commission
+Large orders ($2500-$5000): 65% markup, suggests 25% commission
+Major orders ($5000+): 55% markup, suggests 28% commission
+The 2x rule is enforced: The calculator automatically ensures your margin (sale price minus your cost) is always at least double the commission payout. If a commission rate would violate this, it adjusts the sale price upward.
+
+What you see:
+
+A highlighted "Recommended Pricing" box with the suggested sale price, customer total (including shipping), your margin, and the commission amount
+A full table showing all commission scenarios (10-30%) so you can adjust based on the deal
+The commission is calculated on the sale price only (shipping excluded), and the ratio column shows you exactly how your margin compares to the commission — anything 2.0x or higher gets a green checkmark.
+
+Want me to adjust the margin tiers or commission ranges?
+
+Wholesale calculator
+Code · JSX 
+i like the design but i mean that my margin, after paying the comision should be at least double
+
+Jan 28
+
+Recalibrated margin formula to ensure net profit doubles commission
+
+
+
+
+
+
+
+
+Got it! So your net profit (margin minus commission) should be at least double the commission paid. Let me fix that formula.
+
+
+Recalibrated profit formula to prioritize your net margin
+
+
+
+
+
+
+
+
+
+
+Fixed! The rule now ensures your net profit (what you keep after paying commission) is at least 2x the commission.
+
+Example with $1,000 cost at 20% commission:
+
+Sale price: ~$1,765
+Your margin: $765
+Commission paid: $353
+Your net profit: $412 (2.0x the $353 commission ✓)
+The formula is: Net Profit ≥ 2 × Commission
+
+Which means if you pay a salesperson $100, you're guaranteed to keep at least $200 for yourself after that payout. The "Net:Comm" column in the table shows this ratio for each scenario.
+
+Wholesale calculator
+Code · JSX 
+ok and now we neeed this when i purchase multiple item.s obisusly the whole quote turns out to be higher and i want to put in minimum 6 products or 6 lines of items and i want the calculator to be smart and recognize that multiple items add up and the suggested com rate should be based on this. also sometimes i will have 1 line item in higher quantities as well
+
+Jan 28
+
+Architected multi-line calculator recognizing cumulative totals for tiered commissions
+
+
+
+I'll redesign the calculator to handle multiple line items with quantities, and base the commission tier on the total order value.
+
+
+Architected intelligent multi-item calculator with dynamic commission scaling
+
+
+
+
+Done! Here's what the new multi-item calculator does:
+
+Line Items:
+
+Starts with 6 rows (minimum), can add more with the "+ Add Item" button
+Each line has: description (optional), unit cost, and quantity
+Line totals calculate automatically
+Shows total items count and total units
+Smart Commission Tiers (based on TOTAL order value):
+
+Total Cost	Suggested Commission
+Under $200	15%
+$200-500	18%
+$500-1,000	20%
+$1,000-2,500	22%
+$2,500-5,000	25%
+$5,000-10,000	28%
+$10,000+	30%
+Key Features:
+
+Commission dropdown lets you override the suggested rate
+Click any row in the scenarios table to quickly select that rate
+Per-item pricing breakdown shows you exactly what to charge for each line item
+All pricing keeps your net profit ≥ 2x the commission paid
+So if you have 6 small items that add up to $3,000 total, it'll suggest 25% commission even though each individual item is small — because the total order qualifies for the higher tier.
+
+Want me to adjust the tier thresholds or add anything else?
+
+Wholesale calculator
+Code · JSX 
+please make the net to com ratio more flexible , i want to have a higher ratio on smaller amouints compared to big numbers. for example, lets try total under 10k, ratio to be between 3 and 4 and then gradually changing based on your recommend
+
+Jan 28
+
+Architected tiered ratio system scaling inversely with order magnitude
+
+
+
+
+
+Great idea — smaller orders should have more protection. Let me implement a sliding ratio scale.
+
+
+Prepared flexible ratio adjustment framework
+
+
+
+
+
+
+
+
+
+
+Done! Here's the new sliding ratio scale:
+
+Total Cost	Min Net:Comm Ratio	Suggested Commission
+Under $200	4.0x	15%
+$200-500	3.8x	18%
+$500-1,000	3.5x	20%
+$1,000-2,500	3.2x	22%
+$2,500-5,000	3.0x	25%
+$5,000-10,000	2.8x	28%
+$10,000-25,000	2.5x	30%
+$25,000-50,000	2.2x	30%
+$50,000+	2.0x	30%
+What this means in practice:
+
+$500 order with 20% commission: You keep at least 3.5x what the salesperson gets
+$15,000 order with 30% commission: You keep at least 2.5x what the salesperson gets
+$75,000 order with 30% commission: You keep at least 2.0x what the salesperson gets
+The UI now shows the minimum ratio badge next to the tier name, and there's a quick reference scale at the bottom of the scenarios table.
+
+Want me to adjust any of the ratio thresholds or tier boundaries?
+
+Wholesale calculator
+Code · JSX 
+not sure why 2% difference in Comm changes the sale price to double
+
+Jan 28
+
+Diagnosed mathematical breakdown in ratio formula at high commission rates
+
+
+
+
+
+
+
+
+
+You're right, there's a math issue. With high ratios like 4x combined with higher commission rates, the formula breaks down — it becomes mathematically impossible to achieve.
+
+For example, with a 4x ratio and 20% commission:
+
+You need net profit = 4 × commission
+But commission is 20% of sale price
+The math requires more margin than exists!
+Let me fix this by using the base markup as the floor and showing the actual achieved ratio instead of forcing impossible numbers:
+
+
+Architected fallback logic to stabilize erratic pricing calculations
+
+
+
+Fixed! The issue was that with high target ratios (like 4x) and higher commission rates (like 20%+), the math becomes impossible — you can't keep 4x what you pay out when commission is already 20% of the sale.
+
+What I changed:
+
+Now uses your base markup as the floor price
+Calculates the actual ratio achieved
+Shows ✓ if it meets target, ✗ if not (but still shows the real number)
+So now if you have a small order with 4x target but select 25% commission, it'll use the base markup and show you're actually getting ~2.5x instead of trying to force an impossible 4x with a crazy price.
+
+Try it out — the prices should make sense now across all commission rates. Want me to also adjust the target ratios to more achievable levels, or is this behavior what you were looking for?
+
+Wholesale calculator
+Code · JSX 
+that didnt change anything. so look, when i  buy something for 652, i cannot sell it for 8578 dollars . that doiestn make sense
+
+Jan 28
+
+Recognized flawed formula and restructured pricing logic fundamentally
+
+
+
+
+
+
+You're absolutely right, that's broken. The problem is I'm letting the ratio formula drive the price UP, which is backwards.
+
+Let me fix the logic properly:
+
+Markup determines sale price (based on order size)
+Ratio is just a guide to show which commission rates work well — not to inflate prices
+
+Recalibrated pricing logic to reflect realistic markup constraints
+
+
+
+
+
+
+Now let me also update the suggested commission to be based on which rate actually achieves the target ratio at that markup:
+
+
+Recalibrated pricing model after recognizing unrealistic markup calculations
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fixed! Now the math works properly.
+
+For a $652 cost (Medium Order tier):
+
+Sale price: $652 × 2.0 = $1,304 (not $8,578!)
+Margin: $652
+At different commission rates:
+
+Commission	You Pay	You Keep	Ratio
+10%	$130	$522	4.0x ✓
+15%	$196	$456	2.3x ✓
+20%	$261	$391	1.5x
+25%	$326	$326	1.0x
+30%	$391	$261	0.7x
+The key change: Markup now drives the sale price. The ratio is just a guide to help you pick an appropriate commission rate — it won't inflate prices anymore.
+
+The suggested commission is calculated as the highest rate that still meets your target ratio for that order size. Does this make more sense now?
+
+Wholesale calculator
+Code · JSX 
+ok now lets focus on com rate between 10 and 30 percent and add net:comm between 2 and 4. so that i can choose. basically it should show me in the first tabel 10 com and 4 options for Net:Comm
+same for 15, 20, 22, 25, 30
+
+Jan 28
+
+Architected comprehensive grid showcasing commission and ratio combinations
+
+
+
+Got it! You want a grid showing all combinations — each commission rate (10, 15, 20, 22, 25, 30%) with each Net:Comm ratio (2x, 2.5x, 3x, 3.5x, 4x). Let me rebuild this.
+
+
+Architected multi-dimensional calculator grid for commission exploration
+
+
+
+
+
+
+
+
+
+
+Done! Now you have a full grid to choose from.
+
+The Pricing Grid shows:
+
+2x	2.5x	3x	3.5x	4x
+10%	price	price	price	price	price
+15%	price	price	price	price	price
+20%	price	price	price	price	N/A
+22%	price	price	price	N/A	N/A
+25%	price	price	N/A	N/A	N/A
+30%	price	N/A	N/A	N/A	N/A
+How it works:
+
+Each cell shows the sale price needed to achieve that commission rate AND that net:comm ratio
+Click any cell to select it
+"N/A" means that combination is mathematically impossible (e.g., 30% commission with 4x ratio would require infinite markup)
+Below the cell shows the markup percentage
+Example for $652 cost:
+
+10% commission + 2x ratio → Sell at $978 (50% markup)
+20% commission + 2.5x ratio → Sell at $1,863 (186% markup)
+25% commission + 2x ratio → Sell at $2,608 (300% markup)
+You pick the balance you want between commission rate and how much protection you want for yourself. Higher ratio = more for you, higher commission = more for salesperson.
+
+Wholesale calculator
+Code · JSX 
+1769620228407_image.png
+the math is not correct here
+
+Jan 28
+
+Identified formula error causing unrealistic markup calculations
+
+
+
+
+
+
+
+
+
+
+
+You're right! The formula is technically correct mathematically, but it produces ridiculous results when the combination gets extreme. $50,000 for a $500 item with 9900% markup makes no business sense.
+
+Let me add a maximum markup limit (say 300%) and show N/A for anything beyond that:
+
+
+Deferred judgment pending user verification
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fixed! I added a 350% maximum markup limit. Any combination requiring more than 350% markup now shows N/A.
+
+For your $500 cost, the grid should now look like:
+
+2x	2.5x	3x	3.5x	4x
+10%	$714 (43%)	$769 (54%)	$833 (67%)	$909 (82%)	$1,000 (100%)
+15%	$909 (82%)	$1,053 (111%)	$1,250 (150%)	$1,538 (208%)	$2,000 (300%)
+20%	$1,250 (150%)	$1,667 (233%)	N/A	N/A	N/A
+22%	$1,471 (194%)	$2,174 (335%)	N/A	N/A	N/A
+25%	$2,000 (300%)	N/A	N/A	N/A	N/A
+30%	N/A	N/A	N/A	N/A	N/A
+The reality is: high commission + high ratio = unrealistic markup. For example, 30% commission with 2x ratio would require 900% markup — that's not practical.
+
+If you need 30% commission to work, you'd need to accept a lower ratio (like 1.5x). Want me to add lower ratio options (1.5x, 1.75x) to the grid?
+
+Wholesale calculator
+Code · JSX 
+that doesnt add up. my excel sheet was like this:
+=IF(C4>1000, C4*2.2, IF(C4>=500, C4*3.5, C4*3.5))
+C4 is my buying price per single item and based on that i added the comision in percent and created a suggested selling price and at the end, added shipping. plese use this logic but optimize it, because i have seen that i have less margin on an item that i buy for 1000 dollars compared to an item that i buy for 500 dollars. we need to have a more fine tuned math here
+
+Jan 28
+
+Deconstructed pricing formula and engineered smoother markup scaling
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+I understand now. Your approach is much simpler:
+
+Multiplier based on cost (e.g., $500 × 3.5 = $1,750 sale price)
+Then add commission on that sale price
+Then add shipping
+The problem with your Excel formula is the cliff at $1000 (suddenly drops from 3.5x to 2.2x).
+
+Let me rebuild with smooth multiplier tiers and show you the actual numbers:
+
+
+Architected refined pricing formula addressing margin inconsistencies
+
+
+Completely rebuilt! Here's the new logic:
+
+Step 1: Multiplier based on TOTAL order cost (smooth scale)
+
+Order Cost	Multiplier	Markup
+<$100	4.0x	300%
+$250-500	3.5x	250%
+$500-750	3.2x	220%
+$750-1000	2.9x	190%
+$1000-1500	2.6x	160%
+$2000-3000	2.2x	120%
+$5000-7500	1.9x	90%
+$10000+	1.7-1.5x	70-50%
+No more cliffs — smooth transitions between tiers.
+
+Step 2: Sale Price = Cost × Multiplier (fixed, doesn't change)
+
+Step 3: You choose commission rate (10-30%) The table shows what happens at each rate:
+
+Sale price stays the same
+Commission amount changes
+Your net profit changes
+Net:Comm ratio shown for reference
+Step 4: Add shipping
+
+Example: $500 cost
+
+Multiplier: 3.5x
+Sale price: $1,750 (fixed)
+At 20% commission: You pay $350, keep $900 (2.6x ratio)
+At 10% commission: You pay $175, keep $1,075 (6.1x ratio)
+This matches your Excel logic but with smoother tiers. Want me to adjust the multiplier values?
+
+Wholesale calculator v2
+Code · JSX 
+the multiplier 2.2, 3.5 and 3.5 are buying price times this number, and then add the commision after this result
+
+Jan 28
+
+Reconciled pricing formula: cost multiplier plus commission markup
+
+
+
+
+
+
+
+
+
+
+
+
+
+I understand now. The commission is added ON TOP of the base price, not deducted from your margin.
+
+Your logic:
+
+Cost × multiplier = Base price (what YOU keep)
+Base price × commission% = Commission amount (added on top)
+Customer pays = Base price + Commission + Shipping
+So with $500 cost, 3.5x multiplier, 20% commission:
+
+Base price: $500 × 3.5 = $1,750 (yours)
+Commission: $1,750 × 20% = $350 (added on top)
+Customer pays: $1,750 + $350 = $2,100 + shipping
+Your margin is always $1,250 regardless of commission rate — the customer pays more when there's a salesperson.
+
+
+Recalibrated pricing formula to apply commission after multiplier calculation
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fixed! Now the logic matches your Excel approach:
+
+Formula:
+
+Customer Total = (Cost × Multiplier) + Commission + Shipping
+Example with $500 cost, 3.5x multiplier, 20% commission:
+
+Base price: $500 × 3.5 = $1,750 (what YOU keep)
+Commission: $1,750 × 20% = $350 (added on top)
+Customer subtotal: $1,750 + $350 = $2,100
+Your profit: $1,750 - $500 = $1,250 (same regardless of commission!)
+Key difference from before:
+
+Commission is paid BY THE CUSTOMER, not from your margin
+Your profit stays constant — only the customer price changes with commission rate
+Higher commission = higher customer price, same profit for you
+The table now shows:
+| Commission | Base Price | + Comm. | = Subtotal | Your Profit | + Ship = Total |
+
+Your profit is always the same across all commission rates. The salesperson's cut just makes the customer pay more.
+
+Want me to adjust the multiplier tiers?
+
+Wholesale calculator v2
+Code · JSX 
+i like to  have higher margin on lower numbers please.
+
+Jan 28
+
+Restructured pricing tiers to amplify margins on smaller orders
+
+
+
+
+
+
+Done! Here's the new scale with higher margins on smaller orders:
+
+Cost	Multiplier	Your Margin
+<$100	5.0x	400%
+$100-200	4.5x	350%
+$200-350	4.2x	320%
+$350-500	4.0x	300%
+$500-750	3.5x	250%
+$750-1k	3.2x	220%
+$1k-1.5k	2.8x	180%
+$1.5k-2k	2.5x	150%
+$2k-3k	2.3x	130%
+$3k-5k	2.1x	110%
+$5k-7.5k	1.9x	90%
+$7.5k-10k	1.8x	80%
+$10k-15k	1.7x	70%
+$15k-25k	1.6x	60%
+$25k+	1.5x	50%
+Examples:
+
+$50 item → $250 base (you profit $200)
+$500 item → $2,000 base (you profit $1,500)
+$5,000 order → $10,500 base (you profit $5,500)
+Want me to adjust any specific tiers?
+
+Wholesale calculator v2
+Code · JSX 
+ok maybe we add the option to manually change the mulitplier in case i wnat more or less margin
+
+Jan 28
+
+Implemented manual multiplier adjustment feature successfully
+
+
+
+
+
+
+
+
+
+
+Done! Now you can manually adjust the multiplier:
+
+Features added:
+
+− and + buttons to decrease/increase by 0.1
+Direct input field to type any value (1.1 to 10)
+Shows "Suggested: X.Xx" below so you know the default
+(reset) link appears when you've changed it from suggested
+Header badge shows "(custom)" when you've overridden
+Example:
+
+$500 cost → Suggested 4.0x
+Click + twice → Now 4.2x
+Your base price goes from $2,000 to $2,100
+Click (reset) to go back to 4.0x
+This way you can:
+
+Increase multiplier for difficult/custom jobs
+Decrease for repeat customers or competitive quotes
+Always see what the system suggests as baseline
+Wholesale calculator v2
+Code · JSX 
+i know where the error occurs. the comision is calculated based on subtotal, not on the base price itself. please correct
+
+Jan 28
+
+Recalibrated commission formula to derive subtotal correctly
+
+
+
+
+
+
+
+Got it! Commission is based on the subtotal (the final price before shipping), not the base price.
+
+So if commission is 20% of subtotal:
+
+Base price = $1,750
+Subtotal = Base ÷ (1 - 20%) = $1,750 ÷ 0.80 = $2,187.50
+Commission = $2,187.50 × 20% = $437.50
+
+Rectified commission calculation methodology from base price to subtotal
+
+
+
+
+
+Fixed! Commission is now calculated on the subtotal (final price before shipping).
+
+New formula:
+
+Subtotal = Base Price ÷ (1 - Commission%)
+Commission = Subtotal × Commission%
+Example with $500 cost, 4.0x multiplier, 20% commission:
+
+Base price: $500 × 4.0 = $2,000 (what you keep)
+Subtotal: $2,000 ÷ 0.80 = $2,500
+Commission: $2,500 × 20% = $500 (not $400 like before)
+Your profit: $2,000 - $500 = $1,500 (unchanged)
+Before vs After (20% commission on $2,000 base):
+
+Old (on base)	New (on subtotal)
+Commission	$400	$500
+Subtotal	$2,400	$2,500
+The salesperson now gets paid on what the customer actually pays, which is the correct way to calculate sales commission.
+
+Wholesale calculator v2
+Code · JSX 
+ok that looks good now. make the suggested mark up rate based on information about markups, common calculation strategies and reserach that you do. please note that i also pay an additional 10% in tariffs adjustment after the delivery for each project, maybe you can add this into your suggested multiplier. and then tell me if i can simply use this as html/java or if i have to run it on next or similar. and could we build an iphone app out of it without distributin it online? just local for myself on my phone?
+
+Jan 28
+
+Researched markup strategies, integrated tariff costs, evaluated implementation platforms
+
+
+Let me research markup strategies for wholesale businesses first.
+
+
+Researched markup strategies, integrated tariff calculations, and evaluated deployment options
+
+
+
+
+
+
+
+
+
+
+
+Good research findings! Let me update the calculator with research-based multipliers and add the tariff adjustment.
+
+
+Orchestrated markup research, calculator updates, and deployment feasibility assessment
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Done! Here's what I updated based on research:
+
+Research Findings on Wholesale Markup
+The average wholesale or distributor markup is 20%, although some go up as high as 40%. 
+PROS
+ However, for specialty/custom manufacturing like your signage business:
+
+Common markup percentages range from 50% to 100%, but can be higher or lower depending on the circumstances. 
+Orders In Seconds
+Most wholesalers aim for a 30% to 50% profit margin. 
+Orders In Seconds
+The keystone markup is a common markup ratio... a 100% markup that translates into doubling the price. 
+Erplain
+For specialty B2B manufacturing (custom signage), higher markups are justified because of setup costs, customization, and expertise.
+
+Updated Calculator Features
+New multipliers (based on true cost INCLUDING tariff):
+
+True Cost	Multiplier	Your Markup
+<$100	4.0x	300%
+$250-500	3.5x	250%
+$750-1k	3.0x	200%
+$1k-2.5k	2.6-2.8x	160-180%
+$4k-10k	2.0-2.2x	100-120%
+$25k+	1.5-1.6x	50-60%
+Tariff field added: Default 10% — automatically added to your raw cost before multiplier is applied.
+
+Deployment Options
+Option 1: Plain HTML/JS (Easiest)
+I can convert this to a single HTML file with vanilla JavaScript. You'd just open it in any browser — no server needed.
+
+Option 2: React without Next.js
+Use Vite or Create React App — simpler than Next.js, just run locally.
+
+Option 3: iPhone App (Local Only)
+Best option for you: Progressive Web App (PWA)
+
+Host the HTML file anywhere (even locally via your Mac)
+Open in Safari on iPhone
+Tap "Share" → "Add to Home Screen"
+It looks and works like a native app
+Alternative: Xcode Direct Install
+
+Requires a Mac
+Free Apple Developer account
+App expires every 7 days (needs re-install)
+More hassle than PWA
+Want me to convert this to a single HTML file you can use anywhere, including as a PWA on your iPhone?
+
+Wholesale calculator v2
+Code · JSX 
+can you change the pricing per item section and dont show the base subtotal, instead show subtotal including comision
+
+Jan 28
+
+Restructured pricing table to consolidate columns and highlight commission-inclusive totals
+
+
+
+
+
+
+
+Done! The "Pricing Per Item" table is now cleaner:
+
+Before (too many columns): | Item | Qty | Unit Cost | Unit Base | + Comm. | Unit Total | Line Total |
+
+After (simplified): | Item | Qty | Unit Cost | Unit Price | Line Total |
+
+Unit Price = final price per unit (includes commission)
+Line Total = final line total (includes commission)
+Subtotal = total including commission (shows commission % in label)
+Small note at top right: "Prices include X% commission"
+This is what you'd show a customer — clean unit prices and line totals without exposing the commission breakdown.
+
+Wholesale calculator v2
+Code · JSX 
+dont remove the comision itself in this section, i want to see unit price and the comision of that and the total should be both together. underneath it it should show total of all lines including com
+
+Jan 28
+
+Restructured pricing table layout to display unit price, commission, and combined totals
+
+
+
+
+
+
+Done! The table now shows the full breakdown:
+
+Item	Qty	Unit Cost	Unit Price	+ Comm.	Unit Total	Line Total
+Item 1	2	$100	$350	$87.50	$437.50	$875.00
+Columns:
+
+Unit Price (blue) = your base price per unit
++ Comm. (yellow) = commission per unit
+Unit Total (orange) = unit price + commission
+Line Total (white) = unit total × quantity
+Footer:
+
+Subtotal = total of all line totals (includes commission)
++ Shipping
+Customer Total
+The commission column only appears when "Salesperson = Yes".
+
+Wholesale calculator v2
+Code · JSX 
+1769637564193_image.png
+are you sure that my profit is always the same here
+
+Jan 28
+
+Examined profit calculation logic and identified potential model ambiguity
+
+
+
+
+
+
+
+
+
+
+
+You're right to question this! Let me clarify the current logic:
+
+Current model (commission added ON TOP):
+
+Your cost: ~$978
+Base price: $3,129.28 (what you keep)
+Commission: added for customer to pay extra
+Your profit: $3,129.28 - $978 = $2,151.38 (always same)
+In this model, the customer pays the commission, not you. That's why your profit doesn't change.
+
+But maybe you want this model (commission from YOUR margin):
+
+Your cost: ~$978
+Subtotal to customer: $3,129.28 (fixed)
+Commission comes OUT of your margin
+At 10%: You pay $313, keep $1,838
+At 20%: You pay $626, keep $1,525
+At 30%: You pay $939, keep $1,212
+Which model is correct for your business?
+
+Commission ON TOP (current) — Customer pays more when there's a salesperson. Your profit stays same.
+Commission FROM MARGIN — Customer pays same price. You give part of your margin to salesperson.
+Which one matches how you actually work with your salespeople?
+
+when i buy for 500, i calculate times 3 for example, thats 1500 and add 20% for com and the total sales would be then 1800. i make 1000 on it
+
+Jan 28
+
+Recalibrated commission formula from subtotal-based to base-price-based calculation
+
+
+
+
+
+
+
+Now I understand! Commission is calculated on the base price, not on the subtotal.
+
+Your formula:
+
+Cost: $500
+× 3 = $1,500 (base price)
+Commission: 20% of $1,500 = $300 (added on top)
+Customer pays: $1,500 + $300 = $1,800
+Your profit: $1,500 - $500 = $1,000
+My current (wrong) formula:
+
+Commission: 20% of subtotal
+Subtotal = $1,500 ÷ 0.80 = $1,875
+Commission = $375
+Let me fix it:
+
+
+Verified calculator logic matched user's pricing formula correctly
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fixed! Now the math matches your example:
+
+Your example: $500 cost, 3x multiplier, 20% commission
+
+Base price: $500 × 3 = $1,500
+Commission: 20% of $1,500 = $300
+Customer pays: $1,500 + $300 = $1,800
+Your profit: $1,500 - $500 = $1,000 ✓
+The formula is now:
+
+Commission = Base Price × Commission%
+Not the old (wrong) formula where commission was based on the subtotal.
+
+With this fix, the commission table will show:
+
+| Commission | Base Price | + Comm. | = Subtotal |
+|------------|------------|------
+
+Wholesale calculator v2
+Code · JSX 
+Claude's response was interrupted
+your formula is right, please dont change. uyou are right
+
+Jan 28
+
+Validated formula accuracy and contemplated next implementation steps
+
+
+
+Got it! The formula is now correct:
+
+Formula:
+
+Base Price = (Cost + Tariff) × Multiplier
+Commission = Base Price × Commission%
+Customer Total = Base Price + Commission + Shipping
+Your Profit = Base Price - (Cost + Tariff)
+Example: $500 cost, 10% tariff, 3x multiplier, 20% commission
+
+True cost: $500 + $50 = $550
+Base price: $550 × 3 = $1,650
+Commission: $1,650 × 20% = $330
+Customer pays: $1,650 + $330 + shipping
+Your profit: $1,650 - $550 = $1,100
+Do you want me to convert this to a single HTML file so you can:
+
+Open it directly in any browser (no server needed)
+Add to iPhone home screen as an app (PWA)
+Use offline
+profit is customer total - cost and tarif - com, right?
+
+Jan 28
+
+Verified profit formula equivalence through mathematical reconciliation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Yes, exactly right! Let me confirm the math:
+
+Your formula:
+
+Profit = Subtotal - Cost - Tariff - Commission
+Example: $500 cost, 10% tariff, 3x multiplier, 20% commission
+
+True cost: $500 + $50 tariff = $550
+Base price: $550 × 3 = $1,650
+Commission: $1,650 × 20% = $330
+Subtotal: $1,650 + $330 = $1,980
+Profit calculation:
+
+$1,980 - $500 - $50 - $330 = $1,100
+This is the same as:
+
+Base Price - True Cost = $1,650 - $550 = $1,100
+The commission gets added to what customer pays, then subtracted when you pay salesperson — so it cancels out and doesn't affect your profit. ✓
+
+Shipping is pass-through (not included in profit calculation).
+
+The calculator is correct! Want me to convert it to a standalone HTML file now?
+
+change again, the comision is calculated base price divided by the percentage
+
+Jan 28
+
+Grappled with contradictory formula logic, sought clarification
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+I want to make sure I understand correctly. Can you show me with an example?
+
+If base price is $1,500 and commission is 20%, what should the commission amount be?
+
+Option A: $1,500 × 20% = $300 (multiply)
+
+Option B: $1,500 ÷ 0.80 = $1,875, commission = $375 (divide by inverse)
+
+Option C: Something else?
+
+Your earlier example said $500 × 3 = $1,500, add 20% = $1,800, which means commission was $300 (Option A).
+
+Which one is correct?
+
+if i buy for 500, mulitply by 3, total is 1500, then i do 20%, that means 1500 / 0.8 equals 1875, so comision is 375
+
+Jan 28
+
+Reconciled commission calculation formula with user's clarification
+
+
+
+
+
+
+
+
+
+
+Got it! Now I understand. Commission is based on the subtotal, not the base price.
+
+Your formula:
+
+Base price: $500 × 3 = $1,500
+Subtotal: $1,500 ÷ 0.80 = $1,875
+Commission: $1,875 - $1,500 = $375
+Your profit: $1,875 - $500 - $375 = $1,000
+
+Reconciled commission calculation methodology and confirmed correct approach
+
+
+
+
+Got it! So the commission IS calculated on the subtotal (final price), not the base price. This is what I had before!
+
+Your formula:
+
+Base price: $500 × 3 = $1,500
+Subtotal: $1,500 ÷ 0.80 = $1,875
+Commission: $1,875 × 20% = $375
+Your profit: $1,875 - $500 - $375 = $1,000
+Let me revert to that calculation:
+
+
+Verified the mathematical formula and profit calculations
+
+
+
+
+
+The code is already correct! Let me verify:
+
+Current formula in code:
+
+javascript
+customerSubtotal = basePrice / (1 - commRate / 100);
+commission = customerSubtotal - basePrice;
+netProfit = customerSubtotal - totalCost - commission;
+Example: $500 cost, 3x multiplier, 20% commission
+
+Base price: $500 × 3 = $1,500
+Subtotal: $1,500 ÷ 0.80 = $1,875
+Commission: $1,875 - $1,500 = $375
+Profit: $1,875 - $500 - $375 = $1,000 ✓
+The calculator is already using the correct formula. Let me present the file:
+
+
+Verified pricing formula and confirmed profit calculations remained consistent
+
+
+
+
+
+
+
+
+
+The formula is now correct:
+
+Confirmed formula:
+
+Subtotal = Base Price ÷ (1 - Commission%)
+Commission = Subtotal × Commission%
+Profit = Subtotal - Cost - Tariff - Commission
+       = Base Price - True Cost (same result)
+Your example verified:
+
+Amount
+Cost	$500
+× 3	$1,500
+÷ 0.80	$1,875
+Commission	$375
+Your Profit	$1,000
+The profit ($1,000) equals Base Price ($1,500) minus Cost ($500). Commission is paid by customer, you pay it to salesperson — net zero effect on your profit.
+
+Want me to convert this to a standalone HTML file now?
+
+Wholesale calculator v2
+Code · JSX 
+lets get back to my idea with iphone app or similar, how to do this?
+
+Jan 28
+
+Deliberated iPhone app implementation options and clarification strategy
+
+Here are your options from easiest to hardest:
+
+Option 1: Progressive Web App (PWA) ⭐ RECOMMENDED
+Effort: 10 minutes | No coding | Free
+
+I convert the React to a single HTML file
+You host it somewhere (even free options like GitHub Pages or Netlify)
+On your iPhone: Open in Safari → Share → "Add to Home Screen"
+It looks and works like a native app with an icon
+Pros: Works offline, updates easily, no Apple approval Cons: Need simple hosting (free options available)
+
+Option 2: Local File on iPhone
+Effort: 5 minutes | Free
+
+I create a single HTML file
+Save it to your iCloud Drive or Files app
+Open with Safari from Files
+Pros: No hosting needed, completely private Cons: No home screen icon, have to open from Files each time
+
+Option 3: Run Locally on Your Mac
+Effort: 5 minutes | Free
+
+I create a single HTML file
+Double-click to open in browser on Mac
+Access from iPhone via your Mac's IP on same WiFi
+Pros: No internet needed Cons: Only works when Mac is on, same network
+
+Option 4: Native iPhone App (Xcode)
+Effort: 2-4 hours | Requires Mac | Free but complex
+
+Wrap the HTML in a WKWebView in Xcode
+Install directly to your iPhone via USB
+Requires free Apple Developer account
+Pros: Real app icon, feels native Cons: App expires every 7 days, need to reinstall
+
+My Recommendation
+Go with Option 1 (PWA). Let me:
+
+Convert to a single HTML file
+Add PWA features (offline support, app icon, splash screen)
+You upload to free hosting (I can guide you)
+Want me to create the PWA version now?
+
+ok lets do on git. can you please optimize for iphone
+
+Jan 28
+
+Architected mobile-first HTML conversion with PWA optimization
+
+
+
+I'll create a single HTML file optimized for iPhone with PWA support for "Add to Home Screen".
+
+
+Orchestrated GitHub Pages setup and iPhone optimization strategy
+
+
+Done! Here's your iPhone-optimized calculator.
+
+iPhone optimizations included:
+
+Touch-friendly large buttons (44px+ tap targets)
+No zoom on input focus (maximum-scale=1.0)
+Safe area padding for notch/home bar
+inputmode="decimal" for number pad keyboard
+PWA meta tags for "Add to Home Screen"
+Dark theme that matches iOS dark mode
+Swipe-friendly, no horizontal scroll
+Setup on GitHub Pages (5 minutes)
+Step 1: Create GitHub repo
+
+Go to github.com → New repository
+Name it price-calc (or anything)
+Make it Public
+Click "Create repository"
+Step 2: Upload the file
+
+Click "uploading an existing file"
+Drag the wholesale-calculator.html file
+Rename it to index.html (important!)
+Click "Commit changes"
+Step 3: Enable GitHub Pages
+
+Go to repo Settings → Pages
+Source: "Deploy from a branch"
+Branch: main / root
+Click Save
+Wait 1-2 minutes
+Step 4: Your URL
+
+https://YOUR-USERNAME.github.io/price-calc/
+Add to iPhone Home Screen
+Open the URL in Safari (not Chrome)
+Tap the Share button (square with arrow)
+Scroll down → "Add to Home Screen"
+Name it "Price Calc" → Add
+Now it works like a native app with its own icon! 🎉
+
+Wholesale calculator
+Code · HTML 
+can we change the icon to a nice orange color and a drak blue SLS on it?
+
+Jan 28
+
+Customized icon with orange background and dark blue text
+
+
+
+Done! The icon is now:
+
+Background: Orange (
+#f97316)
+Text: Dark blue "SLS" (
+#1e3a5f)
+Font: Bold system font
+When you add it to your iPhone home screen, you'll see a nice orange square with "SLS" in dark navy blue.
+
+Upload this updated file to GitHub (replace the old one) and re-add to your home screen to see the new icon.
+
+Wholesale calculator
+Code · HTML 
+i added the new htnml but it wont change on iphone?
+
+Jan 28
+
+Diagnosed iOS caching issue and prescribed shortcut removal solution
+
+iOS caches the icon. You need to:
+
+Delete the old shortcut from your home screen (long press → Remove)
+Clear Safari cache: Settings → Safari → Clear History and Website Data
+Re-add to home screen: Open the URL in Safari again → Share → Add to Home Screen
+The icon only gets saved once when you first add it — updating the file won't change an existing shortcut.
+
+i delteed, deleted history but still it shows P instead of SLS on orang
+
+Jan 28
+
+Diagnosed caching issue, pivoted toward PNG solution
+
+
+
+
+iOS doesn't always render SVG data URIs well for icons. Let me create an actual PNG icon file instead:
+
+
+Orchestrated file setup and deployment instructions
+
+
+
+
+iOS works better with actual PNG files. Upload both files to your GitHub repo:
+
+index.html (rename wholesale-calculator.html)
+icon-180.png (keep this name exactly)
+Both files should be in the same folder (root of repo).
+
+Then on your iPhone:
+
+Delete old shortcut
+Settings → Safari → Clear History and Website Data
+Force close Safari (swipe up from bottom, swipe Safari away)
+Reopen Safari → go to your URL
+Add to Home Screen
+The PNG icon should now show orange with "SLS" in dark blue.
+
+Wholesale calculator
+Code · HTML 
+Icon 180
+Image · PNG 
+ok wroked. thanks
+
+Jan 28
+
+Acknowledged resolution and offered continued assistance
+
+Great! Enjoy your new pricing calculator app! 🎉
+
+If you need any changes later — different multipliers, new features, or tweaks — just let me know.
+
+can we adjust that my profit at the end is always at least 2.5 times the commisiosn itself?
+
+7:39 AM
+
+Derived mathematical formula ensuring profit exceeds commission ratio
+
+
+
+
+
+
+
+
+
+
+
+
+I'll add logic to ensure your profit is always at least 2.5× the commission. This means the multiplier will automatically adjust if needed.
+
+
+Formulated adjustment to ensure profit exceeds commission multiplier
+
+
+
+
+
+
+
+
+
+
+
+
+
+Done! Here's what changed:
+
+New features:
+
+Auto-adjusted multiplier — The suggested multiplier now automatically increases if needed to guarantee your profit is ≥ 2.5× the commission
+Ratio column — Shows profit:commission ratio for each row
+Color coding — Green = meets 2.5x, Red = below 2.5x
+Low-ratio rows dimmed — Commission rates that don't meet the ratio are grayed out
+Ratio shown in Quote Summary — Under your profit, shows "2.5x comm." etc.
+Example at 20% commission:
+
+Minimum multiplier needed for 2.5x ratio: 2.7x
+If your cost-based suggested multiplier is 2.4x, it auto-bumps to 2.7x
+Note: At 30% commission, you need a ~4.7x multiplier to maintain 2.5x profit ratio. Very high commission rates may require significant markups.
+
+Upload the new wholesale-calculator.html to GitHub to update your app.
+
+Wholesale calculator
+Code · HTML 
+can you check bewtween 20 adn 25$ com. somehow the difference seems to high, is the math corereect
+
+7:43 AM
+
+Verified commission math and uncovered exponential multiplier jumps
+
+
+
+
+
+
+
+
+
+
+
+
+
+Let me check the math. The big difference might be due to the 2.5x profit ratio requirement.
+
+Minimum multiplier needed for 2.5x profit:commission ratio:
+
+Commission	Min Multiplier
+10%	1.4x
+15%	1.8x
+20%	2.7x
+22%	3.4x
+25%	6.0x
+30%	∞ (impossible!)
+The math is correct, but 2.5x ratio becomes very expensive at high commission rates.
+
+At 25% commission, you need a 6x multiplier just to keep your profit 2.5× the commission. At 30%, it's mathematically impossible.
+
+Would you like to:
+
+Lower the ratio to 2.0x (more realistic for high commission rates)
+Keep 2.5x but understand high commissions need huge markups
+Use sliding ratio (2.5x for low commission, 2.0x for high commission)
+Which approach fits your business better?
+
+Anicom here in this list is my own customer, so is creative sign designs. no comision on the of them, every ither customer is shared with a sales person. can you realte how the margin raio is Row LabelsSum of RevenuesSum of ProfitAnicom $521,548.00  $319,747.11 CIMA $128,313.00  $65,962.52 Latitude $94,314.00  $46,288.89 ADA $42,755.12  $25,187.17 Centerpoint $35,463.80  $19,278.04 Star $30,551.00  $13,608.92 GrafixShoppe $24,349.00  $11,956.78 Ziken $22,982.00  $9,896.52 Chandler $22,366.00  $8,617.39 Fastsigns Missoula $21,408.00  $7,470.17 Nimlok $19,541.00  $9,749.74 Albrecht $16,263.00  $6,994.37 Goebel $14,734.00  $3,047.71 Renze $13,357.00  $5,526.65 Creative Sign Design $11,205.00  $5,807.06 Shad Tracy $10,424.00  $3,679.70 North American Sign $10,127.00  $5,014.32 FirstClassSigns $9,073.00  $4,089.88 SignPro $7,415.00  $3,733.68 LargeFormatGraphics $7,081.00  $3,453.65 Quality Manufacturing $6,831.00  $2,749.90 SOTA Sign $6,681.00  $2,957.25 Icon $6,573.00  $1,920.38 ParvinClauss $6,094.00  $2,581.27 Fastsigns Clearwater $5,900.00  $2,153.90 ARC Riot $4,727.00  $3,046.92 Alphabet Shop $4,713.00  $1,695.32 Red Barn $3,424.00  $1,539.70 American Lift $3,273.00  $1,543.08 Signs Now Dayton $3,157.00  $1,697.45 One East Wracker $2,911.00  $1,473.58 Quality Sign Solution $2,277.00  $1,322.22 Image360 Bloomington $2,033.00  $932.00 Roots Dubai $1,921.00  $1,421.29 Miller Zell $1,888.00  $886.25 Complete sign $750.00  $228.25 image360 sezgin $550.00  $0.05 Chris Judss $540.00  $24.34
+
+Show more
+7:45 AM
+
+Analyzed profit margins across commissioned versus non-commissioned customers
+
+
+
+
+
+Let me analyze your actual data:
+
+Your Own Customers (No Commission):
+
+Customer	Revenue	Profit	Margin %
+Anicom	$521,548	$319,747	61.3%
+Creative Sign Design	$11,205	$5,807	51.8%
+With Salesperson (Commission):
+
+Customer	Revenue	Profit	Margin %
+CIMA	$128,313	$65,963	51.4%
+Latitude	$94,314	$46,289	49.1%
+ADA	$42,755	$25,187	58.9%
+Centerpoint	$35,464	$19,278	54.4%
+Star	$30,551	$13,609	44.6%
+Nimlok	$19,541	$9,750	49.9%
+Ziken	$22,982	$9,897	43.1%
+Chandler	$22,366	$8,617	38.5%
+Fastsigns Missoula	$21,408	$7,470	34.9%
+Goebel	$14,734	$3,048	20.7% ❌
+Icon	$6,573	$1,920	29.2%
+Chris Judss	$540	$24	4.5% ❌
+Key Findings:
+
+Your average margin WITHOUT commission: ~56%
+Your average margin WITH commission: ~45%
+Commission impact: ~10-15% of revenue
+Some customers (Goebel, Icon, Chris Judss) have very low margins — either commission is too high or pricing was too low.
+
+What commission % are you typically paying? If it's 20%, and profit is already deducted, then your actual profit:commission ratio is roughly:
+
+45% profit ÷ 20% commission = 2.25x ratio
+So 2.5x might be too aggressive based on your real data. A 2.0x ratio seems more realistic for your business.
+
+Want me to adjust the calculator to 2.0x instead?
+
+the profit is after payment fee and commiision paid. goebel and chris can be excluded
+
+7:46 AM
+
+Reverse-engineered commission rates from profit data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Good, that helps! Let me recalculate properly.
+
+Your No-Commission Customers (baseline):
+
+Customer	Revenue	Profit	Margin
+Anicom	$521,548	$319,747	61.3%
+Creative Sign Design	$11,205	$5,807	51.8%
+Average			~57%
+With Salesperson (profit AFTER commission paid):
+
+Customer	Revenue	Profit	Margin
+CIMA	$128,313	$65,963	51.4%
+Latitude	$94,314	$46,289	49.1%
+ADA	$42,755	$25,187	58.9%
+Top customers avg			~50%
+The Math:
+
+If no-commission margin is ~57% and with-commission margin is ~50%, then:
+
+Commission paid ≈ 7-10% of revenue
+Your profit:commission ratio ≈ 50% ÷ 8% ≈ 6x 🎉
+You're already doing much better than 2.5x! Your current pricing gives you roughly 5-6x profit for every dollar of commission paid.
+
+Recommendation:
+
+A 2.0x minimum ratio is safe and realistic for your business. This gives you flexibility on pricing while still protecting your margin.
+
+Want me to update the calculator to 2.0x?
+
+1770641236525_image.png
+7:47 AM
+
+Analyzed financial metrics and calculated profit-to-commission ratios
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Now I can see the full picture. Let me calculate your actual profit:commission ratios:
+
+Month	Revenue	Commission	Profit	Profit:Comm Ratio
+Jan	$30,996	$4,808	$14,040	2.9x
+Feb	$48,469	$5,579	$26,473	4.7x
+Mar	$63,997	$5,597	$33,678	6.0x
+Apr	$90,928	$3,660	$54,277	14.8x
+May	$30,335	$3,013	$18,264	6.1x
+Jun	$113,827	$9,552	$53,992	
+Claude's response was interrupted
+1770641236525_image.png
+but 540k usd are without comision (total sales)
+
+7:48 AM
+
+Recalculated commission ratios excluding non-commissioned revenue streams
+
+
+
+
+
+
+
+
+
+
+
+Got it! Let me recalculate with that info:
+
+Total from table:
+
+Total Revenue: ~$1,107,000
+Total Commission: ~$94,777
+Total Profit: ~$602,000
+Splitting it out:
+
+No-commission revenue: $540,000 (Anicom + Creative)
+No-commission profit (at ~57% margin): ~$308,000
+Commission customers only:
+
+Revenue: $1,107,000 - $540,000 = $567,000
+Commission paid: $94,777
+Profit: $602,000 - $308,000 = ~$294,000
+Your actual Profit:Commission ratio:
+
+$294,000 ÷ $94,777 = 3.1x
+Commission as % of commissioned revenue:
+
+$94,777 ÷ $567,000 = 16.7%
+Conclusion:
+
+Your real-world ratio is ~3x. So:
+
+2.5x is achievable but tight
+2.0x gives you more flexibility for competitive quotes
+Want me to keep it at 2.5x or lower to 2.0x?
+
+we need to have a formula when choosing how to do. maybe we add a button that says compettive pricing and we go down to 2x. otherwise i would not do less then 2.5x
+also i m not sure if it works properly when i uncheck the sales person
+
+7:49 AM
+
+Architected competitive pricing toggle and debugged salesperson logic
+
+
+Good idea! I'll add a "Competitive" toggle and fix the no-salesperson mode.
+
+
+Architected pricing toggles and resolved salesperson mode visibility
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Done! Here's what I changed:
+
+New features:
+
+Pricing Mode Toggle
+Standard (2.5x) — Your normal pricing, profit ≥ 2.5× commission
+Competitive (2x) — For competitive quotes, profit ≥ 2× commission
+Fixed No Salesperson Mode
+Commission table hidden (not needed)
+Pricing mode toggle hidden (not applicable)
+Quote summary shows clean view without commission fields
+Shows "No commission" badge instead of commission %
+When Salesperson = No:
+
+Customer pays: Base Price + Shipping
+Your profit: Base Price - True Cost
+No commission calculations at all
+When Salesperson = Yes:
+
+Choose Standard or Competitive mode
+Commission table shows all rates with profit ratios
+Multiplier auto-adjusts to meet the ratio requirement
+Upload the new wholesale-calculator.html to GitHub to update your app!
+
+Wholesale calculator
+Code · HTML 
+the way the com is calculated makes it hard. the net sales, without shippong, is the basis for the commision. lets do following. remove the salesperon button and instead add commision field, i will ad manually. i want to then see the full costs split. and i want to make manual margin (but keep your recommend model too)
+
+7:55 AM
+
+Architected interface modifications for manual commission entry and cost visualization
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Done! Here's what changed:
+
+Simplified Settings:
+
+Tariff % — Manual input (default 10%)
+Commission % — Manual input (default 20%, set to 0 for no commission)
+Shipping — Manual input
+Pricing — 2.5x or 2x ratio toggle
+New Cost Breakdown Section:
+
+Raw Cost (X items)        $500.00
++ Tariff (10%)            $50.00
+─────────────────────────────────
+= Your True Cost          $550.00
+New Pricing Breakdown Section:
+
+True Cost                 $550.00
+× Multiplier (3.0x)       $1,650.00
+÷ (1 - 20%) = Net Sales   $2,062.50
+  Commission (20%)        $412.50
++ Shipping                $100.00
+─────────────────────────────────
+Customer Total            $2,162.50
+
+Net Sales                 $2,062.50
+− True Cost               $550.00
+− Commission              $412.50
+─────────────────────────────────
+= Your Profit             $1,100.00
+Profit : Commission Ratio  2.7x
+Features:
+
+Set commission to 0 for direct customers (no salesperson)
+Manual multiplier adjustment with +/- buttons
+Shows suggested multiplier and minimum for ratio
+Warns if profit ratio is below target
+Upload to GitHub to update your app!
+
+Wholesale calculator
+Code · HTML 
+ok remove the item name fields, just leave item price and quantity
+
+8:01 AM
+
+Identified incomplete modifications to pricing table structure
+
+
+
+
+
+I already removed the item name input fields. Let me also remove the item names from the per-item pricing table:
+
+
+Systematically pruned item name fields across multiple components
+
+
+
+Done! Line items now just show:
+
+# — Item number
+Cost — Unit cost input
+Qty — Quantity input
+The per-item pricing table also simplified to show just the numbers without item names.
+
+Upload to GitHub to update your app.
+
+Wholesale calculator
+Code · HTML 
+how much more should i do, compared ti my sales guy. i think thats a lot what he gets compares to me but 25% is ok, considering he is without base salaray, right?
+
+8:06 AM
+
+Analyzed commission ratios and benchmarked industry standards comprehensively
+
+
+
+
+
+
+
+
+Based on your data, let me break this down:
+
+Your Current Reality (~17% avg commission):
+
+Amount	% of Net Sales
+Net Sales	$567,000	100%
+Your Cost (COGS)	~$273,000	48%
+Commission	$94,777	17%
+Your Profit	$294,000	35%
+Ratio: You make 3.1x what salesperson makes
+
+At 25% Commission (same sales):
+
+Amount	% of Net Sales
+Net Sales	$567,000	100%
+Your Cost	~$273,000	48%
+Commission	$141,750	25%
+Your Profit	$152,250	27%
+Ratio: You'd make 1.1x what salesperson makes — almost equal!
+
+Is 25% Fair?
+
+Yes, 25% commission-only is standard and fair because:
+
+No base salary = salesperson takes all the risk
+No benefits — no health insurance, PTO, 401k from you
+They pay self-employment tax (~15% extra)
+Their real take-home after taxes: closer to 18-20%
+Industry norm: 20-30% for commission-only B2B sales
+But watch your margins. At 25%, you're almost splitting profits 50/50. That's fine if:
+
+They're bringing NEW customers you wouldn't have
+You're not doing much sales work yourself
+Your volume increases significantly
+If you're still heavily involved in quoting, customer service, and production — you might want to stay at 20% or negotiate 25% only for new accounts they bring in.
+
+he is brining in custoers onls, i take care of the rest.
+
+8:07 AM
+
+Weighed disproportionate workload against comparable compensation
+
+
+
+
+That changes things. Let's compare what each of you actually does:
+
+Salesperson (25% = ~$142K):
+
+Finds customers
+Closes deals
+That's it
+You (27% = ~$152K after commission):
+
+Quoting & estimating
+Customer service
+Production management
+Quality control
+Shipping & logistics
+Invoicing & collections
+Problem solving
+Managing suppliers (China, Germany)
+Running the whole business
+Taking all the financial risk
+You're doing 10x the work for almost the same money.
+
+At 25%, you're basically partners — but you own the business, take all the risk, and do 90% of the work.
+
+My recommendation:
+
+Commission	When to Use
+15-18%	Fair for "brings customers only"
+20%	Generous, if they bring good volume
+25%	Only for major accounts or if they also handle customer service
+Alternative structure to consider:
+
+15% base commission on all sales
++5% bonus if they hit quarterly targets
+This motivates them to grow, not just maintain
+What's your current agreement with him? Is 25% locked in or negotiable?
+
+thtas why i try to find the sweet sport after which i should give 20% only. A certain costs point after which i shlould offer 25 percent. if i buy for 200 including shipping,m we can da even 30% for him but if i but for a 1000 dollar, it should be different. what logic wold you consider?
+
+8:09 AM
+
+Calculated tiered commission rates based on cost thresholds
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Smart thinking! Let me work out the math:
+
+The Logic:
+
+Small orders → Higher markup (3.5-4x) → More room for commission
+Large orders → Lower markup (1.5-2x) → Less room, need lower commission
+Tiered Commission Based on True Cost:
+
+True Cost	Your Markup	Commission	Your Profit:Comm Ratio
+<$500	3.5-4.0x	25%	~2.5x
+$500-$2,000	2.6-3.0x	22%	~2.5x
+$2,000-$5,000	2.2-2.6x	20%	~2.5x
+$5,000-$10,000	2.0-2.2x	18%	~2.5x
+$10,000+	1.5-1.85x	15%	~2.5x
+Example at each tier:
+
+True Cost	Multiplier	Net Sales	Commission	Your Profit	Ratio
+$300	3.5x	$1,400	$350 (25%)	$750	2.1x
+$1,000	2.8x	$3,889	$856 (22%)	$1,800	2.1x
+$3,000	2.4x	$9,000	$1,800 (20%)	$4,200	2.3x
+$7,000	2.1x	$17,927	$3,227 (18%)	$7,700	2.4x
+$15,000	1.7x	$30,000	$4,500 (15%)	$10,500	2.3x
+Note: 30% commission only works if you go to 5x+ markup — probably too high for most customers. I'd cap at 25% even on small orders.
+
+Want me to add this tiered commission logic to the calculator automatically?
+
+yes
+
+8:11 AM
+
+Integrated tiered commission structure into system
+
+
+
+
+
+
+
+
+
+
+
+Done! Here's what's new:
+
+Auto Commission Tiers:
+
+True Cost	Commission
+<$500	25%
+$500-$2,000	22%
+$2,000-$5,000	20%
+$5,000-$10,000	18%
+$10,000+	15%
+How it works:
+
+Green "Auto" button — When active, commission auto-adjusts based on true cost
+Manual override — Type a different %, Auto turns off
+Toggle back — Tap Auto button to re-enable
+Visual indicators:
+
+Shows tier guide under commission field
+Green badge shows "Auto: X% comm." in cost breakdown when auto is on
+Upload to GitHub to update your app!
+
+Wholesale calculator
+Code · HTML 
+lets deduct the 10% tarif adjustment at the end from my net profit
+
+8:17 AM
+
+Restructured profit breakdown to deduct tariff last
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Done! The profit breakdown now shows:
+
+Net Sales              $2,062.50
+− Raw Cost             $500.00
+− Commission (20%)     $412.50
+− Tariff (10%)         $50.00
+────────────────────────────────
+= Your Net Profit      $1,100.00
+This makes it clear that tariff comes out of your pocket at the end, not just baked into cost.
+
+Upload to GitHub to update!
+
+Wholesale calculator
+Code · HTML 
+you have to make the mulitplierr based on net cost of goods and deduct the 10 tariff at the end only from my net profit please
+
+8:20 AM
+
+Synthesized pricing structure adjustments and profit calculations
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Done! Here's the new logic:
+
+Pricing Formula:
+
+Raw Cost × Multiplier ÷ (1 - Comm%) = Net Sales
+Your Profit Calculation:
+
+Net Sales            $2,500.00
+− Raw Cost           $500.00
+− Commission (20%)   $500.00
+− Tariff (10%)       $50.00
+─────────────────────────────
+= Your Net Profit    $1,450.00
+Key Changes:
+
+Multiplier is now based on Raw Cost (not cost + tariff)
+Auto commission tiers based on Raw Cost
+Tariff is only deducted at the end from your profit
+Min multiplier formula now accounts for tariff in the profit ratio calculation
+This way you see exactly what comes out of your pocket: raw cost, commission, AND tariff — all separately.
+
+Upload to GitHub to update!
+
+Wholesale calculator
+Code · HTML 
+
+
+
+
+Claude is AI and can make mistakes. Please double-check responses.
+Wholesale calculator · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,8 +2150,7 @@
     
     /* Line Items */
     .line-item {
-      display: grid;
-      grid-template-columns: 1fr 70px 70px 30px;
+      display: flex;
       gap: 8px;
       align-items: center;
       margin-bottom: 8px;
@@ -160,28 +2159,27 @@
       border-radius: 10px;
     }
     
+    .line-item .line-num {
+      font-size: 14px;
+      color: #6b7280;
+      width: 24px;
+    }
+    
     .line-item input {
       padding: 10px 8px;
       font-size: 14px;
       background: #4b5563;
       border: none;
+      border-radius: 8px;
     }
     
     .line-item .cost-input {
-      padding-left: 20px;
+      padding-left: 24px;
     }
     
     .line-item .prefix {
       left: 8px;
       font-size: 14px;
-    }
-    
-    .line-item-num {
-      font-size: 12px;
-      color: #6b7280;
-      position: absolute;
-      top: -18px;
-      left: 0;
     }
     
     .remove-btn {
@@ -256,6 +2254,30 @@
       background: #f97316;
       border-color: #f97316;
       color: white;
+    }
+    
+    .auto-btn {
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: #374151;
+      border: 1px solid #4b5563;
+      color: #9ca3af;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .auto-btn.active {
+      background: #059669;
+      border-color: #059669;
+      color: white;
+    }
+    
+    .tier-hint {
+      font-size: 10px;
+      color: #6b7280;
+      margin-top: 6px;
+      line-height: 1.4;
     }
     
     /* Totals Row */
@@ -384,6 +2406,12 @@
     .subtotal-value { color: #fb923c; }
     .profit-value { color: #4ade80; font-weight: 600; }
     .total-value-cell { color: #e5e7eb; }
+    .ratio-good { color: #4ade80; font-weight: 600; }
+    .ratio-bad { color: #f87171; font-weight: 600; }
+    
+    .commission-table tr.low-ratio {
+      opacity: 0.6;
+    }
     
     /* Quote Summary */
     .quote-summary {
@@ -429,6 +2457,14 @@
     .summary-sub {
       font-size: 10px;
       color: #6b7280;
+    }
+    
+    .summary-sub.ratio-good {
+      color: #4ade80;
+    }
+    
+    .summary-sub.ratio-bad {
+      color: #f87171;
     }
     
     .customer-total {
@@ -501,6 +2537,48 @@
       color: #6b7280;
     }
     
+    /* Breakdown Table */
+    .breakdown-table {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      color: #d1d5db;
+    }
+    
+    .breakdown-row.indent {
+      padding-left: 16px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+    
+    .breakdown-row.total {
+      padding-top: 8px;
+      margin-top: 4px;
+      border-top: 1px solid #374151;
+      font-weight: 600;
+      color: #ffffff;
+    }
+    
+    .breakdown-row.total.big {
+      font-size: 18px;
+      padding-top: 12px;
+      margin-top: 8px;
+    }
+    
+    .breakdown-row .blue { color: #60a5fa; }
+    .breakdown-row .orange { color: #fb923c; }
+    .breakdown-row .yellow { color: #facc15; }
+    .breakdown-row .green { color: #4ade80; }
+    .breakdown-row .red { color: #f87171; }
+    .breakdown-row .gray { color: #9ca3af; }
+    
     /* Info Badge */
     .info-badge {
       display: inline-block;
@@ -547,7 +2625,7 @@
   <div class="container" id="app">
     <!-- Header -->
     <h1>Wholesale Pricing</h1>
-    <p class="subtitle">(Cost + Tariff) × Multiplier ÷ (1 - Comm%) + Shipping</p>
+    <p class="subtitle">Raw Cost × Multiplier ÷ (1 - Comm%) + Shipping</p>
     
     <!-- Line Items -->
     <div class="card">
@@ -560,7 +2638,7 @@
     
     <!-- Settings -->
     <div class="card">
-      <div class="settings-grid three-col">
+      <div class="settings-grid" style="grid-template-columns: 1fr 1fr;">
         <div>
           <label>Tariff %</label>
           <div class="input-with-suffix">
@@ -575,12 +2653,25 @@
             <input type="number" id="shippingCost" placeholder="0" inputmode="decimal" onchange="calculate()">
           </div>
         </div>
-        <div>
-          <label>Salesperson?</label>
-          <div class="toggle-group">
-            <button class="toggle-btn active" id="salesYes" onclick="setSalesperson(true)">Yes</button>
-            <button class="toggle-btn" id="salesNo" onclick="setSalesperson(false)">No</button>
+      </div>
+      <div style="margin-top: 12px;">
+        <label>Commission %</label>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="input-with-suffix" style="flex: 1;">
+            <input type="number" id="commissionPercent" value="20" inputmode="decimal" onchange="setManualCommission(this.value)">
+            <span class="suffix">%</span>
           </div>
+          <button class="auto-btn active" id="autoCommBtn" onclick="toggleAutoCommission()">Auto</button>
+        </div>
+        <div id="commissionTiers" class="tier-hint">
+          <$500 → 25% · $500-2K → 22% · $2K-5K → 20% · $5K-10K → 18% · $10K+ → 15%
+        </div>
+      </div>
+      <div style="margin-top: 12px;">
+        <label>Pricing Mode (min profit:commission ratio)</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" id="pricingStandard" onclick="setCompetitiveMode(false)">Standard (2.5x)</button>
+          <button class="toggle-btn" id="pricingCompetitive" onclick="setCompetitiveMode(true)">Competitive (2x)</button>
         </div>
       </div>
     </div>
@@ -592,13 +2683,13 @@
   <script>
     // State
     let lineItems = [
-      { id: 1, description: '', unitCost: '', quantity: '1' },
-      { id: 2, description: '', unitCost: '', quantity: '1' },
-      { id: 3, description: '', unitCost: '', quantity: '1' }
+      { id: 1, unitCost: '', quantity: '1' },
+      { id: 2, unitCost: '', quantity: '1' },
+      { id: 3, unitCost: '', quantity: '1' }
     ];
-    let hasSalesperson = true;
-    let selectedCommission = 20;
     let customMultiplier = null;
+    let competitiveMode = false;
+    let autoCommission = true;
     let nextId = 4;
     
     // Multiplier function based on research
@@ -620,6 +2711,36 @@
       return 1.5;
     }
     
+    // Tiered commission based on true cost
+    function getSuggestedCommission(cost) {
+      if (cost <= 0) return 20;
+      if (cost < 500) return 25;
+      if (cost < 2000) return 22;
+      if (cost < 5000) return 20;
+      if (cost < 10000) return 18;
+      return 15;
+    }
+    
+    // Minimum multiplier to ensure profit >= ratio × commission
+    // Profit = Net Sales - Raw Cost - Commission - Tariff
+    function getMinMultiplier(commRate, ratio, rawCost, tariffRate = 0) {
+      if (commRate <= 0) return 1.1;
+      const rate = commRate / 100;
+      const tRate = tariffRate / 100;
+      // profit = basePrice - rawCost - tariff = basePrice - rawCost * (1 + tRate)
+      // commission = basePrice * rate / (1 - rate)
+      // profit >= ratio * commission
+      // basePrice - rawCost * (1 + tRate) >= ratio * basePrice * rate / (1 - rate)
+      // multiplier >= (1 + tRate) * (1 - rate) / (1 - rate * (1 + ratio))
+      const denominator = 1 - rate * (1 + ratio);
+      if (denominator <= 0) return 999; // Impossible at this commission rate
+      return (1 + tRate) * (1 - rate) / denominator;
+    }
+    
+    function getProfitRatio() {
+      return competitiveMode ? 2.0 : 2.5;
+    }
+    
     function formatCurrency(num) {
       return new Intl.NumberFormat('en-US', { 
         style: 'currency', 
@@ -629,7 +2750,7 @@
     }
     
     function addLineItem() {
-      lineItems.push({ id: nextId++, description: '', unitCost: '', quantity: '1' });
+      lineItems.push({ id: nextId++, unitCost: '', quantity: '1' });
       renderLineItems();
     }
     
@@ -649,15 +2770,25 @@
       }
     }
     
-    function setSalesperson(value) {
-      hasSalesperson = value;
-      document.getElementById('salesYes').classList.toggle('active', value);
-      document.getElementById('salesNo').classList.toggle('active', !value);
+    function setCompetitiveMode(value) {
+      competitiveMode = value;
+      document.getElementById('pricingStandard').classList.toggle('active', !value);
+      document.getElementById('pricingCompetitive').classList.toggle('active', value);
+      // Reset custom multiplier when changing mode
+      customMultiplier = null;
       calculate();
     }
     
-    function selectCommission(rate) {
-      selectedCommission = rate;
+    function toggleAutoCommission() {
+      autoCommission = !autoCommission;
+      document.getElementById('autoCommBtn').classList.toggle('active', autoCommission);
+      calculate();
+    }
+    
+    function setManualCommission(value) {
+      autoCommission = false;
+      document.getElementById('autoCommBtn').classList.remove('active');
+      document.getElementById('commissionPercent').value = value;
       calculate();
     }
     
@@ -681,27 +2812,26 @@
     }
     
     function getTotalCost() {
-      const tariff = parseFloat(document.getElementById('tariffPercent').value) || 0;
+      // Returns RAW cost (before tariff) for multiplier calculation
       const totalRawCost = lineItems.reduce((sum, item) => {
         const cost = parseFloat(item.unitCost) || 0;
         const qty = parseInt(item.quantity) || 0;
         return sum + (cost * qty);
       }, 0);
-      return totalRawCost * (1 + tariff / 100);
+      return totalRawCost;
     }
     
     function renderLineItems() {
       const container = document.getElementById('lineItems');
       container.innerHTML = lineItems.map((item, index) => `
         <div class="line-item">
-          <input type="text" placeholder="Item ${index + 1}" value="${item.description}" 
-                 onchange="updateLineItem(${item.id}, 'description', this.value)">
-          <div class="input-with-prefix">
+          <span class="line-num">${index + 1}.</span>
+          <div class="input-with-prefix" style="flex: 1;">
             <span class="prefix">$</span>
-            <input type="number" class="cost-input" placeholder="0" value="${item.unitCost}" 
+            <input type="number" class="cost-input" placeholder="Cost" value="${item.unitCost}" 
                    inputmode="decimal" onchange="updateLineItem(${item.id}, 'unitCost', this.value)">
           </div>
-          <input type="number" placeholder="1" value="${item.quantity}" style="text-align: center;"
+          <input type="number" placeholder="Qty" value="${item.quantity}" style="text-align: center; width: 60px;"
                  inputmode="numeric" onchange="updateLineItem(${item.id}, 'quantity', this.value)">
           <button class="remove-btn" onclick="removeLineItem(${item.id})" ${lineItems.length <= 1 ? 'style="visibility:hidden"' : ''}>×</button>
         </div>
@@ -735,41 +2865,53 @@
       
       const totalRawCost = activeItems.reduce((sum, item) => sum + item.lineCost, 0);
       const tariffAmount = totalRawCost * (tariff / 100);
-      const totalCost = totalRawCost + tariffAmount;
       const totalQuantity = activeItems.reduce((sum, item) => sum + item.qtyNum, 0);
       
-      const suggestedMultiplier = getMultiplier(totalCost);
-      const multiplier = customMultiplier !== null ? customMultiplier : suggestedMultiplier;
-      const basePrice = totalCost * multiplier;
+      // Auto commission based on RAW cost (before tariff)
+      const suggestedCommission = getSuggestedCommission(totalRawCost);
+      let commissionRate;
+      if (autoCommission) {
+        commissionRate = suggestedCommission;
+        document.getElementById('commissionPercent').value = suggestedCommission;
+      } else {
+        commissionRate = parseFloat(document.getElementById('commissionPercent').value) || 0;
+      }
       
-      // Commission scenarios
-      const commissionRates = [10, 15, 20, 22, 25, 30];
-      const scenarios = commissionRates.map(rate => {
-        let subtotal, commission;
-        if (hasSalesperson && rate > 0) {
-          subtotal = basePrice / (1 - rate / 100);
-          commission = subtotal - basePrice;
-        } else {
-          subtotal = basePrice;
-          commission = 0;
-        }
-        const customerTotal = subtotal + shipping;
-        const profit = subtotal - totalCost - commission;
-        
-        return { rate, basePrice, commission, subtotal, profit, customerTotal };
-      });
+      // Multiplier based on RAW cost (before tariff)
+      const suggestedMultiplier = getMultiplier(totalRawCost);
+      const PROFIT_RATIO = getProfitRatio();
+      const minMultForComm = commissionRate > 0 ? getMinMultiplier(commissionRate, PROFIT_RATIO, totalRawCost, tariff) : 1.1;
+      const adjustedSuggested = commissionRate > 0 ? Math.max(suggestedMultiplier, Math.ceil(minMultForComm * 10) / 10) : suggestedMultiplier;
+      const multiplier = customMultiplier !== null ? customMultiplier : adjustedSuggested;
       
-      const selected = scenarios.find(s => s.rate === selectedCommission) || scenarios[2];
+      // Base price from RAW cost
+      const basePrice = totalRawCost * multiplier;
       
-      // Per-item pricing
+      // Calculate commission on net sales (subtotal without shipping)
+      let subtotal, commission;
+      if (commissionRate > 0) {
+        subtotal = basePrice / (1 - commissionRate / 100);
+        commission = subtotal - basePrice;
+      } else {
+        subtotal = basePrice;
+        commission = 0;
+      }
+      
+      const customerTotal = subtotal + shipping;
+      // Profit = Net Sales - Raw Cost - Commission - Tariff (tariff deducted at end)
+      const profit = subtotal - totalRawCost - commission - tariffAmount;
+      const profitRatio = commission > 0 ? profit / commission : 999;
+      const meetsRatio = commissionRate === 0 || profitRatio >= PROFIT_RATIO;
+      
+      // Per-item pricing (based on raw cost ratio)
       const itemPricing = activeItems.map(item => {
-        const ratio = item.lineCost / totalCost;
+        const ratio = item.lineCost / totalRawCost;
         const itemBase = basePrice * ratio;
         const unitBase = itemBase / item.qtyNum;
         
         let itemSubtotal, itemCommission;
-        if (hasSalesperson && selectedCommission > 0) {
-          itemSubtotal = itemBase / (1 - selectedCommission / 100);
+        if (commissionRate > 0) {
+          itemSubtotal = itemBase / (1 - commissionRate / 100);
           itemCommission = itemSubtotal - itemBase;
         } else {
           itemSubtotal = itemBase;
@@ -783,111 +2925,120 @@
       
       // Render results
       document.getElementById('results').innerHTML = `
-        <!-- Totals Summary -->
-        <div class="card">
-          <div class="totals-row" style="border: none; padding-top: 0; margin-top: 0;">
-            <div>
-              <div class="total-label">Raw Cost</div>
-              <div class="total-value" style="font-size: 14px; color: #9ca3af;">${formatCurrency(totalRawCost)}</div>
-            </div>
-            ${tariffAmount > 0 ? `
-            <div>
-              <div class="total-label">+ ${tariff}% Tariff</div>
-              <div class="total-value red" style="font-size: 14px;">${formatCurrency(tariffAmount)}</div>
-            </div>
-            ` : ''}
-            <div>
-              <div class="total-label">True Cost</div>
-              <div class="total-value white" style="font-size: 16px;">${formatCurrency(totalCost)}</div>
-            </div>
-            <div>
-              <div class="total-label">Multiplier</div>
-              <div class="multiplier-control">
-                <button class="mult-btn" onclick="adjustMultiplier(-0.1)">−</button>
-                <input type="number" class="mult-input" value="${multiplier.toFixed(1)}" 
-                       onchange="setMultiplier(this.value)" step="0.1" min="1.1" max="10">
-                <button class="mult-btn" onclick="adjustMultiplier(0.1)">+</button>
-              </div>
-              <div class="mult-suggested">
-                Suggested: ${suggestedMultiplier}x
-                ${customMultiplier !== null && customMultiplier !== suggestedMultiplier ? 
-                  `<button onclick="resetMultiplier()">reset</button>` : ''}
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Commission Table -->
+        <!-- Multiplier Control -->
         <div class="card">
           <div class="card-title">
-            Select Commission Rate
-            <span class="info-badge${customMultiplier !== null && customMultiplier !== suggestedMultiplier ? ' purple' : ''}">${((multiplier - 1) * 100).toFixed(0)}% markup${customMultiplier !== null && customMultiplier !== suggestedMultiplier ? ' (custom)' : ''}</span>
+            Multiplier
+            <span class="info-badge">${((multiplier - 1) * 100).toFixed(0)}% markup</span>
           </div>
-          <table class="commission-table">
-            <thead>
-              <tr>
-                <th>Comm.</th>
-                <th>Base</th>
-                <th>+ Comm.</th>
-                <th>Subtotal</th>
-                <th>Profit</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${scenarios.map(s => `
-                <tr class="${s.rate === selectedCommission ? 'selected' : ''}" onclick="selectCommission(${s.rate})">
-                  <td>${s.rate}%</td>
-                  <td>${formatCurrency(s.basePrice)}</td>
-                  <td class="comm-value">${hasSalesperson ? formatCurrency(s.commission) : '—'}</td>
-                  <td class="subtotal-value">${formatCurrency(s.subtotal)}</td>
-                  <td class="profit-value">${formatCurrency(s.profit)}</td>
-                  <td class="total-value-cell">${formatCurrency(s.customerTotal)}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-          <div class="helper-text">
-            Tap a row to select. Commission = Subtotal × Rate.
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+            <div class="multiplier-control" style="flex: 1;">
+              <button class="mult-btn" onclick="adjustMultiplier(-0.1)">−</button>
+              <input type="number" class="mult-input" value="${multiplier.toFixed(1)}" 
+                     onchange="setMultiplier(this.value)" step="0.1" min="1.1" max="10">
+              <button class="mult-btn" onclick="adjustMultiplier(0.1)">+</button>
+            </div>
+            <div style="text-align: right;">
+              <div class="mult-suggested">
+                Suggested: ${adjustedSuggested.toFixed(1)}x
+                ${customMultiplier !== null && customMultiplier !== adjustedSuggested ? 
+                  `<button onclick="resetMultiplier()">reset</button>` : ''}
+              </div>
+              ${commissionRate > 0 ? `<div style="font-size: 10px; color: ${meetsRatio ? '#4ade80' : '#f87171'};">Min for ${PROFIT_RATIO}x ratio: ${minMultForComm.toFixed(1)}x</div>` : ''}
+            </div>
           </div>
         </div>
         
-        <!-- Quote Summary -->
+        <!-- Cost Breakdown -->
+        <div class="card">
+          <div class="card-title">
+            Cost of Goods
+            ${autoCommission ? `<span class="info-badge" style="background: rgba(5, 150, 105, 0.2); color: #34d399;">Auto: ${commissionRate}% comm.</span>` : ''}
+          </div>
+          <div class="breakdown-table">
+            <div class="breakdown-row total" style="border: none; padding: 0; margin: 0;">
+              <span>Raw Cost (${activeItems.length} item${activeItems.length > 1 ? 's' : ''})</span>
+              <span>${formatCurrency(totalRawCost)}</span>
+            </div>
+          </div>
+          <div class="tier-hint" style="margin-top: 8px;">
+            Tariff (${tariff}%) = ${formatCurrency(tariffAmount)} — deducted from your profit at end
+          </div>
+        </div>
+        
+        <!-- Pricing Breakdown -->
         <div class="card quote-summary">
           <div class="card-title" style="color: #fdba74;">
-            Quote Summary
-            <span class="info-badge yellow">${selectedCommission}% commission</span>
+            Pricing Breakdown
+            ${!meetsRatio && commissionRate > 0 ? `<span class="info-badge" style="background: rgba(248, 113, 113, 0.2); color: #f87171;">Below ${PROFIT_RATIO}x ratio!</span>` : ''}
           </div>
-          <div class="summary-grid">
-            <div class="summary-item">
-              <div class="summary-label">True Cost</div>
-              <div class="summary-value">${formatCurrency(totalCost)}</div>
+          <div class="breakdown-table">
+            <div class="breakdown-row">
+              <span>Raw Cost</span>
+              <span>${formatCurrency(totalRawCost)}</span>
             </div>
-            <div class="summary-item">
-              <div class="summary-label">× ${multiplier.toFixed(1)}</div>
-              <div class="summary-value blue">${formatCurrency(selected.basePrice)}</div>
-              <div class="summary-sub">Base Price</div>
+            <div class="breakdown-row">
+              <span>× Multiplier (${multiplier.toFixed(1)}x)</span>
+              <span class="blue">${formatCurrency(basePrice)}</span>
             </div>
-            <div class="summary-item">
-              <div class="summary-label">+ ${selectedCommission}% Comm.</div>
-              <div class="summary-value yellow">${hasSalesperson ? formatCurrency(selected.commission) : '$0'}</div>
+            ${commissionRate > 0 ? `
+            <div class="breakdown-row">
+              <span>÷ (1 - ${commissionRate}%) = Net Sales</span>
+              <span class="orange">${formatCurrency(subtotal)}</span>
             </div>
-            <div class="summary-item">
-              <div class="summary-label">= Subtotal</div>
-              <div class="summary-value orange">${formatCurrency(selected.subtotal)}</div>
+            <div class="breakdown-row indent">
+              <span>Commission (${commissionRate}% of ${formatCurrency(subtotal)})</span>
+              <span class="yellow">${formatCurrency(commission)}</span>
             </div>
-            <div class="summary-item">
-              <div class="summary-label">+ Shipping</div>
-              <div class="summary-value gray">${formatCurrency(shipping)}</div>
+            ` : `
+            <div class="breakdown-row">
+              <span>= Net Sales</span>
+              <span class="orange">${formatCurrency(subtotal)}</span>
             </div>
-            <div class="summary-item profit">
-              <div class="summary-label">Your Profit</div>
-              <div class="summary-value green">${formatCurrency(selected.profit)}</div>
+            `}
+            <div class="breakdown-row">
+              <span>+ Shipping</span>
+              <span class="gray">${formatCurrency(shipping)}</span>
+            </div>
+            <div class="breakdown-row total big">
+              <span>Customer Total</span>
+              <span>${formatCurrency(customerTotal)}</span>
             </div>
           </div>
-          <div class="customer-total">
-            <div class="customer-total-label">Customer Pays</div>
-            <div class="customer-total-value">${formatCurrency(selected.customerTotal)}</div>
+          
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #374151;">
+            <div class="breakdown-table">
+              <div class="breakdown-row">
+                <span>Net Sales</span>
+                <span>${formatCurrency(subtotal)}</span>
+              </div>
+              <div class="breakdown-row">
+                <span>− Raw Cost</span>
+                <span>${formatCurrency(totalRawCost)}</span>
+              </div>
+              ${commissionRate > 0 ? `
+              <div class="breakdown-row">
+                <span>− Commission (${commissionRate}%)</span>
+                <span class="yellow">${formatCurrency(commission)}</span>
+              </div>
+              ` : ''}
+              ${tariffAmount > 0 ? `
+              <div class="breakdown-row">
+                <span>− Tariff (${tariff}%)</span>
+                <span class="red">${formatCurrency(tariffAmount)}</span>
+              </div>
+              ` : ''}
+              <div class="breakdown-row total">
+                <span>= Your Net Profit</span>
+                <span class="green">${formatCurrency(profit)}</span>
+              </div>
+              ${commissionRate > 0 ? `
+              <div class="breakdown-row" style="margin-top: 8px;">
+                <span>Profit : Commission Ratio</span>
+                <span class="${profitRatio >= PROFIT_RATIO ? 'ratio-good' : 'ratio-bad'}">${profitRatio.toFixed(1)}x</span>
+              </div>
+              ` : ''}
+            </div>
           </div>
         </div>
         
@@ -895,28 +3046,28 @@
         <div class="card">
           <div class="card-title">
             Pricing Per Item
-            ${hasSalesperson ? `<small>incl. ${selectedCommission}% comm.</small>` : ''}
+            ${commissionRate > 0 ? `<small>incl. ${commissionRate}% comm.</small>` : ''}
           </div>
           <table class="item-table">
             <thead>
               <tr>
-                <th>Item</th>
+                <th>#</th>
                 <th>Qty</th>
                 <th>Cost</th>
                 <th>Price</th>
-                ${hasSalesperson ? '<th>Comm.</th>' : ''}
-                <th>Total</th>
+                ${commissionRate > 0 ? '<th>Comm.</th>' : ''}
+                <th>Unit</th>
                 <th>Line</th>
               </tr>
             </thead>
             <tbody>
               ${itemPricing.map((item, i) => `
                 <tr>
-                  <td>${item.description || `Item ${i + 1}`}</td>
+                  <td style="color: #6b7280;">${i + 1}</td>
                   <td style="text-align: center; color: #9ca3af;">${item.qtyNum}</td>
                   <td style="color: #9ca3af;">${formatCurrency(item.unitCostNum)}</td>
                   <td class="unit-price">${formatCurrency(item.unitBase)}</td>
-                  ${hasSalesperson ? `<td class="unit-comm">${formatCurrency(item.unitCommission)}</td>` : ''}
+                  ${commissionRate > 0 ? `<td class="unit-comm">${formatCurrency(item.unitCommission)}</td>` : ''}
                   <td class="unit-total">${formatCurrency(item.unitSubtotal)}</td>
                   <td class="line-total">${formatCurrency(item.itemSubtotal)}</td>
                 </tr>
@@ -924,16 +3075,16 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="${hasSalesperson ? 6 : 5}" style="text-align: right; color: #9ca3af;">Subtotal${hasSalesperson ? ` (incl. ${selectedCommission}% comm.)` : ''}:</td>
-                <td class="line-total" style="color: #fb923c;">${formatCurrency(selected.subtotal)}</td>
+                <td colspan="${commissionRate > 0 ? 6 : 5}" style="text-align: right; color: #9ca3af;">Subtotal${commissionRate > 0 ? ` (incl. ${commissionRate}% comm.)` : ''}:</td>
+                <td class="line-total" style="color: #fb923c;">${formatCurrency(subtotal)}</td>
               </tr>
               <tr>
-                <td colspan="${hasSalesperson ? 6 : 5}" style="text-align: right; color: #6b7280;">+ Shipping:</td>
+                <td colspan="${commissionRate > 0 ? 6 : 5}" style="text-align: right; color: #6b7280;">+ Shipping:</td>
                 <td style="color: #9ca3af;">${formatCurrency(shipping)}</td>
               </tr>
               <tr>
-                <td colspan="${hasSalesperson ? 6 : 5}" style="text-align: right; color: #e5e7eb; font-weight: 600;">Customer Total:</td>
-                <td style="color: #ffffff; font-weight: 700; font-size: 14px;">${formatCurrency(selected.customerTotal)}</td>
+                <td colspan="${commissionRate > 0 ? 6 : 5}" style="text-align: right; color: #e5e7eb; font-weight: 600;">Customer Total:</td>
+                <td style="color: #ffffff; font-weight: 700; font-size: 14px;">${formatCurrency(customerTotal)}</td>
               </tr>
             </tfoot>
           </table>
@@ -947,3 +3098,4 @@
   </script>
 </body>
 </html>
+China import pricing and commission calculator - Claude
