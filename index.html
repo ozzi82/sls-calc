@@ -7,6 +7,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Price Calc">
   <meta name="theme-color" content="#111827">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Wholesale Pricing Calculator</title>
   
   <!-- PWA Manifest -->
@@ -55,6 +58,27 @@
       font-weight: 700;
       color: #f97316;
       margin-bottom: 4px;
+    }
+    
+    .refresh-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #374151;
+      border: 1px solid #4b5563;
+      color: #9ca3af;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s;
+    }
+    
+    .refresh-btn:active {
+      background: #4b5563;
+      color: #f97316;
+      transform: rotate(180deg);
     }
     
     .subtitle {
@@ -624,8 +648,13 @@
 <body>
   <div class="container" id="app">
     <!-- Header -->
-    <h1>Wholesale Pricing</h1>
-    <p class="subtitle">Raw Cost × Multiplier ÷ (1 - Comm%) + Shipping</p>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+      <div>
+        <h1>Wholesale Pricing</h1>
+        <p class="subtitle">Raw Cost × Multiplier ÷ (1 - Comm%) + Shipping</p>
+      </div>
+      <button onclick="refreshApp()" class="refresh-btn" title="Sync latest version">↻</button>
+    </div>
     
     <!-- Line Items -->
     <div class="card">
@@ -681,6 +710,18 @@
   </div>
 
   <script>
+    // Force refresh from server (bypass cache)
+    function refreshApp() {
+      // Clear caches if available
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name));
+        });
+      }
+      // Reload with cache bust
+      window.location.href = window.location.pathname + '?v=' + Date.now();
+    }
+    
     // State
     let lineItems = [
       { id: 1, unitCost: '', quantity: '1' },
